@@ -71,12 +71,14 @@ def download_video(video_url, name='default'):
     tries = 0
     while True:
         try:
+            print(f'Start downloading: {video_url}')
             info = ydl.extract_info(video_url)
             return info
         except TypeError as e:
             # This is an error that seems to occurr from time to time
             # A short wait and retry often seems to fix the problem
             # This is something about pornhub not properly loading the video.
+            print('Got TypeError bug')
             time.sleep(20)
             tries += 1
 

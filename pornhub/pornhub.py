@@ -31,6 +31,7 @@ def create_user(args):
 def download_user_videos(session, user):
     """Download all videos of a user."""
     viewkeys = get_user_video_viewkeys(user)
+    print(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
         clip = Clip.get_or_create(session, viewkey, user)
 
