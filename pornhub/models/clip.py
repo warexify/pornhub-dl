@@ -1,12 +1,11 @@
 """The sqlite model for a Movie."""
-from sqlalchemy import (
-    Column,
-    String,
-    Boolean,
-    Integer,
-    ForeignKey,
-)
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import (
+    Boolean,
+    DateTime,
+    String,
+)
 
 from pornhub.db import base
 
@@ -18,15 +17,23 @@ class Clip(base):
 
     viewkey = Column(String, primary_key=True)
     user_key = Column(String, ForeignKey('user.key'), index=True)
-    name = Column(String)
-    size = Column(Integer)
+    title = Column(String)
     completed = Column(Boolean, nullable=False, default=False)
+    downloaded = Column(DateTime)
 
     user = relationship("User")
 
-    def __init__(self, viewkey, name, user, size):
+    def __init__(self, viewkey, user):
         """Create a new Movie."""
         self.viewkey = viewkey
-        self.name = name
         self.user = user
-        self.size = size
+
+    def get_or_create(session, viewkey, user):
+        """Get an existing clip or create a new one."""
+        clip = session.query(Clip).get(viewkey)
+
+        if clip is None:
+            clip = Clip(viewkey, user)
+            session.add(clip)
+
+        return clip

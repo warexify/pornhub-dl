@@ -1,11 +1,11 @@
 """The sqlite model for a user."""
-from sqlalchemy import (
-    Column,
+from sqlalchemy import Column, func
+from sqlalchemy.orm import relationship
+from sqlalchemy.types import (
+    Boolean,
     DateTime,
-    func,
     String,
 )
-from sqlalchemy.orm import relationship
 
 from pornhub.db import base
 
@@ -15,13 +15,14 @@ class User(base):
 
     __tablename__ = 'user'
 
-    FULL_USER = 'user'
-    SINGLE_VIDEO = 'video'
-    CHANNEL = 'channel'
+    USER = 'user'
+    MODEL = 'model'
+    PORNSTAR = 'pornstar'
 
     key = Column(String, primary_key=True)
     name = Column(String, unique=True)
     user_type = Column(String)
+    subscribed = Column(Boolean, default=False, nullable=False)
 
     last_scan = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
@@ -33,3 +34,14 @@ class User(base):
         self.key = key
         self.name = name
         self.user_type = user_type
+
+    def get_or_create(session, key, name, user_type):
+        """Get an existing user or create a new one."""
+        user = session.query(User).get(key)
+
+        if user is None:
+            user = User(key, name, user_type)
+            session.add(user)
+            session.commit()
+
+        return user

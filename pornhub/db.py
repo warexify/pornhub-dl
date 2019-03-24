@@ -1,11 +1,13 @@
 """Helper class to get a database engine and a session."""
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils.functions import database_exists, create_database
 
-engine = create_engine('sqlite:////var/lib/encarne/encarne.db')
+db_location = os.path.expanduser('~/.local/share/pornhub.db')
+engine = create_engine(f'sqlite:///{db_location}')
 base = declarative_base(bind=engine)
 
 

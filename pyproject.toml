@@ -10,6 +10,11 @@ repository = "https://github.com/nukesor/pornhub"
 requests = "^2.21.0"
 beautifulsoup4 = "^4.7.0"
 youtube_dl = "^2019"
+alembic = "^1.0"
+SQLAlchemy = "1.3"
+sqlalchemy-utils = "^0.33"
+psycopg2-binary = "^2.7"
+
 
 [tool.poetry.dev-dependencies]
 # Linting
