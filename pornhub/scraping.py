@@ -54,7 +54,7 @@ def get_user_video_viewkeys(user):
         current_page += 1
         next_url = url + f'?pages={current_page}'
 
-        time.sleep(2)
+        time.sleep(20)
         soup = get_soup(next_url)
 
     return keys
@@ -65,6 +65,7 @@ def download_video(video_url, name='default'):
     options = {
         'outtmpl': f'~/pornhub/{name}/%(title)s.%(ext)s',
         'format': 'best',
+        'quiet': True,
     }
     ydl = youtube_dl.YoutubeDL(options)
     tries = 0
@@ -76,7 +77,7 @@ def download_video(video_url, name='default'):
             # This is an error that seems to occurr from time to time
             # A short wait and retry often seems to fix the problem
             # This is something about pornhub not properly loading the video.
-            time.sleep(2)
+            time.sleep(20)
             tries += 1
 
             # If this happens too many times, something else must be broken.

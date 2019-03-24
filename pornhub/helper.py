@@ -25,7 +25,7 @@ def get_user_info(key):
 def get_user_type_and_url(key):
     """Detect the user type and the respective url for this user."""
     possible_urls = {}
-    for user_type in [User.USER, User.MODEL, User.PORNSTAR]:
+    for user_type in [User.PORNSTAR, User.MODEL, User.USER]:
         possible_urls[user_type] = get_user_video_url(user_type, key)
 
     for user_type, url in possible_urls.items():
