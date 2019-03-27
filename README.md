@@ -25,6 +25,11 @@ If you update your database, all new videos will be downloaded, while old ones a
 ## Files and Directories
 Videos are downloaded to `~/pornhub/`. A sqlite database is created in `~/.local/share/pornhub.db`.
 
+## Migrating
+
+For migrating the database, change the $USER placeholder in alembic.ini to your name.
+Afterwards execute `poetry run alembic upgrade head`
+
 Disclaimer:
 
 This project is not associated in any way with the operators of the official pornhub.com
