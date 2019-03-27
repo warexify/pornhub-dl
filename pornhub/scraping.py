@@ -6,8 +6,6 @@ import youtube_dl
 from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
-from pornhub.helper import get_user_video_url
-
 
 def get_soup(url):
     """Get new soup instance from url."""
@@ -28,51 +26,6 @@ def get_soup(url):
             continue
 
         return soup
-
-
-def get_user_video_viewkeys(user):
-    """Scrape all viewkeys of the user's videos."""
-    url = get_user_video_url(user.user_type, user.key)
-    soup = get_soup(url)
-
-    navigation = soup.find_all('div', {'class': 'pagination3'})[0]
-    if len(navigation) >= 1:
-        children = navigation.findChildren('li', {'class': 'page_number'})
-        pages = len(children) + 1
-    else:
-        pages = 1
-
-    keys = []
-    current_page = 1
-    next_url = url
-    while current_page <= pages:
-        print(f'Crawling {next_url}')
-        videos = soup.find(id='mostRecentVideosSection')
-
-        for video in videos.find_all('li'):
-            keys.append(video['_vkey'])
-
-        current_page += 1
-        next_url = url + f'?pages={current_page}'
-
-        time.sleep(20)
-        soup = get_soup(next_url)
-
-    return keys
-
-
-def get_playlist_video_viewkeys(playlist):
-    """Scrape all viewkeys of the playlist's videos."""
-    url = f'https://www.pornhub.com/playlist/{playlist.id}'
-    soup = get_soup(url)
-
-    videos = soup.find_all('ul', {'id': 'videoPlaylist'})[0]
-
-    keys = []
-    for video in videos.find_all('li'):
-        keys.append(video['_vkey'])
-
-    return keys
 
 
 def download_video(video_url, name='default'):

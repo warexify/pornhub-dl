@@ -1,14 +1,15 @@
 #!/bin/env python3
 """A scraper for pornhub."""
 from datetime import datetime
-from pornhub.scraping import (
-    get_user_video_viewkeys,
-    get_playlist_video_viewkeys,
-    download_video,
-)
+
 from pornhub.db import get_session
-from pornhub.helper import get_user_info, get_playlist_info
-from pornhub.models import User, Clip, Playlist
+from pornhub.models import User, Playlist
+from pornhub.extractors import (
+    get_user_info,
+    get_playlist_info,
+    download_user_videos,
+    download_playlist_videos,
+)
 
 
 def create_user(args):
@@ -39,66 +40,27 @@ def create_playlist(args):
         info = get_playlist_info(playlist_id)
         playlist = Playlist.get_or_create(session, playlist_id, info['name'])
 
-    download_playlist_videos(playlist)
+    download_playlist_videos(session, playlist)
     playlist.last_scan = datetime.now()
     session.commit()
-
-
-def download_playlist_videos(session, playlist):
-    """Download all videos of a playlist."""
-    viewkeys = get_playlist_video_viewkeys(playlist)
-    print(f'Found {len(viewkeys)} videos.')
-    for viewkey in viewkeys:
-        clip = Clip.get_or_create(session, viewkey, playlist)
-
-        # The clip has already been downloaded, skip it.
-        if clip.completed:
-            continue
-
-        url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
-
-        success, info = download_video(url, f'playlists/{playlist.name}')
-        if success:
-            clip.title = info['title']
-            clip.completed = True
-
-            print(f'New video: {clip.title}')
-
-        session.commit()
-
-
-def download_user_videos(session, user):
-    """Download all videos of a user."""
-    viewkeys = get_user_video_viewkeys(user)
-    print(f'Found {len(viewkeys)} videos.')
-    for viewkey in viewkeys:
-        clip = Clip.get_or_create(session, viewkey, user)
-
-        # The clip has already been downloaded, skip it.
-        if clip.completed:
-            continue
-
-        url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
-
-        success, info = download_video(url, user.name)
-        if success:
-            clip.title = info['title']
-            clip.completed = True
-
-            print(f'New video: {clip.title}')
-
-        session.commit()
 
 
 def update(args):
     """Get all information about a user and download their videos."""
     session = get_session()
     users = session.query(User).all()
+    playlists = session.query(Playlist).all()
 
     for user in users:
         download_user_videos(session, user)
         user.last_scan = datetime.now()
         session.commit()
+
+    for playlist in playlists:
+        download_playlist_videos(session, playlist)
+        user.last_scan = datetime.now()
+        session.commit()
+
 
 
 def get_video(args):

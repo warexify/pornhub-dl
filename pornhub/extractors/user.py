@@ -1,18 +1,39 @@
 """Helper for extracting meta information from pornhub."""
+import time
 import requests
 from bs4 import BeautifulSoup
 
-from pornhub.models import User
+from pornhub.models import User, Clip
+from pornhub.scraping import get_soup, download_video
+
+
+def download_user_videos(session, user):
+    """Download all videos of a user."""
+    viewkeys = get_user_video_viewkeys(user)
+    print(f'Found {len(viewkeys)} videos.')
+    for viewkey in viewkeys:
+        clip = Clip.get_or_create(session, viewkey, user)
+
+        # The clip has already been downloaded, skip it.
+        if clip.completed:
+            continue
+
+        url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
+
+        success, info = download_video(url, user.name)
+        if success:
+            clip.title = info['title']
+            clip.completed = True
+            clip.user = user
+
+            print(f'New video: {clip.title}')
+
+        session.commit()
 
 
 def get_user_video_url(user_type, key):
     """Compile the user videos url."""
     return f'https://www.pornhub.com/{user_type}/{key}/videos'
-
-
-def get_playlist_video_url(playlist_id):
-    """Compile the user videos url."""
-    return f'https://www.pornhub.com/playlist/{playlist_id}'
 
 
 def get_user_info(key):
@@ -24,23 +45,6 @@ def get_user_info(key):
         'type': user_type,
         'url': url,
         'name': name.strip(),
-    }
-
-
-def get_playlist_info(playlist_id):
-    """Get meta information from playlist website."""
-    url = get_playlist_video_url(playlist_id)
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-    else:
-        raise Exception("Got invalid response for playlist")
-
-    header = soup.find_all('div', {'id': 'playlistTopHeader'})
-    link = header.find_all('a')
-
-    return {
-        'info': link.text,
     }
 
 
@@ -80,3 +84,34 @@ def get_name_from_soup(soup, website_type):
         name = h1.contents[0]
 
     return name
+
+
+def get_user_video_viewkeys(user):
+    """Scrape all viewkeys of the user's videos."""
+    url = get_user_video_url(user.user_type, user.key)
+    soup = get_soup(url)
+
+    navigation = soup.find_all('div', {'class': 'pagination3'})[0]
+    if len(navigation) >= 1:
+        children = navigation.findChildren('li', {'class': 'page_number'})
+        pages = len(children) + 1
+    else:
+        pages = 1
+
+    keys = []
+    current_page = 1
+    next_url = url
+    while current_page <= pages:
+        print(f'Crawling {next_url}')
+        videos = soup.find(id='mostRecentVideosSection')
+
+        for video in videos.find_all('li'):
+            keys.append(video['_vkey'])
+
+        current_page += 1
+        next_url = url + f'?pages={current_page}'
+
+        time.sleep(20)
+        soup = get_soup(next_url)
+
+    return keys

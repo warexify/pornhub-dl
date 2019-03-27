@@ -24,7 +24,7 @@ get_user_sp.set_defaults(func=create_user)
 # Get all videos from a playlist
 get_playlist_sp = subparsers.add_parser('get_playlist', help='Get all videos from a playlist.')
 get_playlist_sp.add_argument(
-    'key', type=str, help='The key of the playlist you want to download (name in url e.g. /playlists/51023901).')
+    'id', type=str, help='The id of the playlist you want to download (number in url e.g. /playlists/51023901).')
 get_playlist_sp.set_defaults(func=create_playlist)
 
 
