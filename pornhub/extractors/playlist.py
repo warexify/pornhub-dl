@@ -1,4 +1,5 @@
 """Playlist extracting logic."""
+import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -11,7 +12,7 @@ def download_playlist_videos(session, playlist):
     viewkeys = get_playlist_video_viewkeys(playlist)
     print(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
-        clip = Clip.get_or_create(session, viewkey, playlist)
+        clip = Clip.get_or_create(session, viewkey)
 
         # The clip has already been downloaded, skip it.
         if clip.completed:
@@ -46,8 +47,12 @@ def get_playlist_info(playlist_id):
     header = soup.find_all('div', {'id': 'playlistTopHeader'})[0]
     link = header.find_all('a')[0]
 
+    name = link.text.strip()
+    name = name.replace(' ', '_')
+    name = re.sub(r'[\W]+', '_', name)
+
     return {
-        'name': link.text,
+        'name': name,
     }
 
 

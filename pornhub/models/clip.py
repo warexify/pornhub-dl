@@ -17,20 +17,18 @@ class Clip(base):
 
     viewkey = Column(String, primary_key=True)
     user_key = Column(String, ForeignKey('user.key'), index=True)
-    playlist_name = Column(String, ForeignKey('playlist.name'), index=True)
     title = Column(String)
     completed = Column(Boolean, nullable=False, default=False)
     downloaded = Column(DateTime)
 
     user = relationship("User")
-    playlist = relationship("Playlist")
 
-    def __init__(self, viewkey, user):
+    def __init__(self, viewkey, user=None):
         """Create a new Movie."""
         self.viewkey = viewkey
         self.user = user
 
-    def get_or_create(session, viewkey, user):
+    def get_or_create(session, viewkey, user=None):
         """Get an existing clip or create a new one."""
         clip = session.query(Clip).get(viewkey)
 

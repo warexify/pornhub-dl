@@ -1,4 +1,5 @@
 """Helper for extracting meta information from pornhub."""
+import re
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -15,7 +16,7 @@ def download_user_videos(session, user):
         clip = Clip.get_or_create(session, viewkey, user)
 
         # The clip has already been downloaded, skip it.
-        if clip.completed:
+        if clip.completed and clip.user == user:
             continue
 
         url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
@@ -41,10 +42,14 @@ def get_user_info(key):
     user_type, url, soup = get_user_type_and_url(key)
     name = get_name_from_soup(soup, 'user')
 
+    name = name.strip()
+    name = name.replace(' ', '_')
+    name = re.sub(r'[\W]+', '_', name)
+
     return {
         'type': user_type,
         'url': url,
-        'name': name.strip(),
+        'name': name,
     }
 
 
@@ -111,7 +116,7 @@ def get_user_video_viewkeys(user):
         current_page += 1
         next_url = url + f'?pages={current_page}'
 
-        time.sleep(20)
+        time.sleep(4)
         soup = get_soup(next_url)
 
     return keys

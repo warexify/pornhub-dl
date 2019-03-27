@@ -1,6 +1,5 @@
 """The sqlite model for a playlist."""
 from sqlalchemy import Column, func
-from sqlalchemy.orm import relationship
 from sqlalchemy.types import (
     DateTime,
     String,
@@ -19,8 +18,6 @@ class Playlist(base):
 
     last_scan = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-
-    clips = relationship('Clip')
 
     def __init__(self, playlist_id, name):
         """Create a new playlist."""
