@@ -31,7 +31,7 @@ def get_soup(url):
 
 
 def get_user_video_viewkeys(user):
-    """Scrape all chapters of the story and write it to a file."""
+    """Scrape all viewkeys of the user's videos."""
     url = get_user_video_url(user.user_type, user.key)
     soup = get_soup(url)
 
@@ -61,6 +61,20 @@ def get_user_video_viewkeys(user):
     return keys
 
 
+def get_playlist_video_viewkeys(playlist):
+    """Scrape all viewkeys of the playlist's videos."""
+    url = f'https://www.pornhub.com/playlist/{playlist.id}'
+    soup = get_soup(url)
+
+    videos = soup.find_all('ul', {'id': 'videoPlaylist'})[0]
+
+    keys = []
+    for video in videos.find_all('li'):
+        keys.append(video['_vkey'])
+
+    return keys
+
+
 def download_video(video_url, name='default'):
     """Download the video."""
     options = {
@@ -75,7 +89,7 @@ def download_video(video_url, name='default'):
             print(f'Start downloading: {video_url}')
             info = ydl.extract_info(video_url)
             return True, info
-        except TypeError as e:
+        except TypeError:
             # This is an error that seems to occurr from time to time
             # A short wait and retry often seems to fix the problem
             # This is something about pornhub not properly loading the video.

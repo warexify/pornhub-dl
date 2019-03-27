@@ -1,0 +1,38 @@
+"""The sqlite model for a playlist."""
+from sqlalchemy import Column, func
+from sqlalchemy.orm import relationship
+from sqlalchemy.types import (
+    DateTime,
+    String,
+)
+
+from pornhub.db import base
+
+
+class Playlist(base):
+    """The model for a playlist."""
+
+    __tablename__ = 'playlist'
+
+    id = Column(String, primary_key=True)
+    name = Column(String)
+
+    last_scan = Column(DateTime)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    clips = relationship('Clip')
+
+    def __init__(self, playlist_id, name):
+        """Create a new playlist."""
+        self.id = playlist_id
+
+    def get_or_create(session, playlist_id, name):
+        """Get an existing playlist or create a new one."""
+        playlist = session.query(Playlist).get(playlist_id)
+
+        if playlist is None:
+            playlist = Playlist(playlist_id)
+            session.add(playlist)
+            session.commit()
+
+        return playlist

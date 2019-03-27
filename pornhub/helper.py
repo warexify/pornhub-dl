@@ -10,6 +10,11 @@ def get_user_video_url(user_type, key):
     return f'https://www.pornhub.com/{user_type}/{key}/videos'
 
 
+def get_playlist_video_url(playlist_id):
+    """Compile the user videos url."""
+    return f'https://www.pornhub.com/playlist/{playlist_id}'
+
+
 def get_user_info(key):
     """Get all necessary user information."""
     user_type, url, soup = get_user_type_and_url(key)
@@ -19,6 +24,23 @@ def get_user_info(key):
         'type': user_type,
         'url': url,
         'name': name.strip(),
+    }
+
+
+def get_playlist_info(playlist_id):
+    """Get meta information from playlist website."""
+    url = get_playlist_video_url(playlist_id)
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+    else:
+        raise Exception("Got invalid response for playlist")
+
+    header = soup.find_all('div', {'id': 'playlistTopHeader'})
+    link = header.find_all('a')
+
+    return {
+        'info': link.text,
     }
 
 

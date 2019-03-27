@@ -1,6 +1,6 @@
 """Commandline argument handling."""
 import argparse
-from pornhub.pornhub import update, create_user, get_video
+from pornhub.pornhub import update, create_user, get_video, create_playlist
 
 parser = argparse.ArgumentParser(description='Download your favorite pornhub stuff.')
 
@@ -20,6 +20,13 @@ get_user_sp = subparsers.add_parser('get_user', help='Get all videos from a user
 get_user_sp.add_argument(
     'key', type=str, help='The key of the user you want to download (name in url e.g. /model/lure-lady).')
 get_user_sp.set_defaults(func=create_user)
+
+# Get all videos from a playlist
+get_playlist_sp = subparsers.add_parser('get_playlist', help='Get all videos from a playlist.')
+get_playlist_sp.add_argument(
+    'key', type=str, help='The key of the playlist you want to download (name in url e.g. /playlists/51023901).')
+get_playlist_sp.set_defaults(func=create_playlist)
+
 
 # Get new videos of all subscribed users/channels
 update_sp = subparsers.add_parser('update', help='Get new videos of all subscribed users/channels.')
