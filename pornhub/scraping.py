@@ -3,6 +3,7 @@ import time
 import traceback
 import requests
 import youtube_dl
+from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
 from pornhub.helper import get_user_video_url
@@ -73,7 +74,7 @@ def download_video(video_url, name='default'):
         try:
             print(f'Start downloading: {video_url}')
             info = ydl.extract_info(video_url)
-            return info
+            return True, info
         except TypeError as e:
             # This is an error that seems to occurr from time to time
             # A short wait and retry often seems to fix the problem
@@ -84,8 +85,13 @@ def download_video(video_url, name='default'):
 
             # If this happens too many times, something else must be broken.
             if tries > 10:
-                raise e
+                return False, None
             continue
+        except DownloadError:
+            # We got a download error.
+            # Ignore for now and continue downloading the other videos
+            print("DownloadError: Failed to download video.")
+            return False, None
 
         time.sleep(20)
-        return
+    return False, None

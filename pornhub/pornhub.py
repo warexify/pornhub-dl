@@ -41,11 +41,12 @@ def download_user_videos(session, user):
 
         url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
 
-        info = download_video(url, user.name)
-        clip.title = info['title']
-        clip.completed = True
+        success, info = download_video(url, user.name)
+        if success:
+            clip.title = info['title']
+            clip.completed = True
 
-        print(f'New video: {clip.title}')
+            print(f'New video: {clip.title}')
 
         session.commit()
 
