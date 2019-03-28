@@ -102,7 +102,7 @@ def get_user_name_from_soup(soup, website_type):
 #        h1 = wrap.find_all('a')[0]
 #        name = h1.contents[0]
 
-    profileHeader = soup.find('topProfileHeader')
+    profileHeader = soup.find(id='topProfileHeader')
 
     # Try to get the user name from subscription element
     div = profileHeader.find_all('div', {'class': 'nameSubscribe'})

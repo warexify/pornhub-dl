@@ -44,7 +44,7 @@ def get_playlist_info(playlist_id):
     else:
         raise Exception("Got invalid response for playlist")
 
-    header = soup.find('playlistTopHeader')
+    header = soup.find(id='playlistTopHeader')
     link = header.find_all('a')[0]
 
     name = link.text.strip()
@@ -61,7 +61,7 @@ def get_playlist_video_viewkeys(playlist):
     url = f'https://www.pornhub.com/playlist/{playlist.id}'
     soup = get_soup(url)
 
-    videos = soup.find('videoPlaylist')
+    videos = soup.find(id='videoPlaylist')
 
     keys = []
     for video in videos.find_all('li'):
