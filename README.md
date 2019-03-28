@@ -1,9 +1,16 @@
 # Pornhub-dl
 
-Download all videos of your favorite pornhub models and channels.
+Download all videos of your favorite pornhub models, playlists and channels and update all your stuff with a simple command.
 
 ## Setup
 You will need `poetry` for dependency management and venv creation: `poetry install --develop .`
+The default config will create a new postgres database `pornhub`.
+If you want to change this, you need to adjust the sqluri in `db.py`.
+
+## Migrating
+
+Just execute `poetry run alembic upgrade head`.
+If you use another database engine/nam, you need to adjust the sqluri in alembic.ini as well.
 
 ## Usage
 The project is used by invocing `runner.py`. In combination with poetry this looks like this: `poetry run python runner.py`  
@@ -25,11 +32,6 @@ If you update your database, all new videos will be downloaded, while old ones a
 
 ## Files and Directories
 Videos are downloaded to `~/pornhub/`. A sqlite database is created in `~/.local/share/pornhub.db`.
-
-## Migrating
-
-For migrating the database, change the $USER placeholder in alembic.ini to your name.
-Afterwards execute `poetry run alembic upgrade head`
 
 Disclaimer:
 
