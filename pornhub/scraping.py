@@ -13,7 +13,11 @@ def get_soup(url):
     while True:
         try:
             response = requests.get(url)
-            response.raise_for_status()
+
+            # Couldn't find the site. Stop and return None
+            if response.status_code == 404:
+                return None
+
             soup = BeautifulSoup(response.text, 'html.parser')
         except BaseException as e:
             print('Got exception during html fetch.')
@@ -60,5 +64,5 @@ def download_video(video_url, name='default'):
             print("DownloadError: Failed to download video.")
             return False, None
 
-        time.sleep(20)
+        time.sleep(6)
     return False, None
