@@ -15,7 +15,7 @@ class User(base):
 
     __tablename__ = 'user'
 
-    USER = 'user'
+    USER = 'users'
     MODEL = 'model'
     PORNSTAR = 'pornstar'
 

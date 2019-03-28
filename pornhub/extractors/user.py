@@ -79,7 +79,7 @@ def get_user_type_and_url(key):
         possible_urls[user_type] = get_user_video_url(user_type, key)
 
     for user_type, url in possible_urls.items():
-        response = requests.get(url)
+        response = requests.get(url, allow_redirects=False)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
             return user_type, url, soup
@@ -105,15 +105,15 @@ def get_user_name_from_soup(soup, website_type):
     profileHeader = soup.find(id='topProfileHeader')
 
     # Try to get the user name from subscription element
-    div = profileHeader.find_all('div', {'class': 'nameSubscribe'})
-    if len(div) == 1:
-        h1 = div[0].find_all('h1')[0]
+    div = profileHeader.find('div', {'class': 'nameSubscribe'})
+    if div is not None:
+        h1 = div.find('h1')
         return h1.text
 
     # Try to get the user name  from normal profile
-    div = profileHeader.find_all('div', {'class': 'profileUserName'})
-    if len(div) == 1:
-        a = div[0].find_all('a')[0]
+    div = profileHeader.find('div', {'class': 'profileUserName'})
+    if div is not None:
+        a = div.find('a')
         return a.text
 
     return None
@@ -124,9 +124,9 @@ def get_recent_video_viewkeys(user):
     url = get_user_video_url(user.user_type, user.key)
     soup = get_soup(url)
 
-    navigation = soup.find_all('div', {'class': 'pagination3'})
-    if len(navigation) >= 1:
-        children = navigation[0].findChildren('li', {'class': 'page_number'})
+    navigation = soup.find('div', {'class': 'pagination3'})
+    if navigation is not None:
+        children = navigation.findChildren('li', {'class': 'page_number'})
         pages = len(children) + 1
     else:
         pages = 1
@@ -167,9 +167,9 @@ def get_public_user_video_viewkeys(user):
 
     soup = get_soup(url)
 
-    navigation = soup.find_all('div', {'class': 'pagination3'})
-    if len(navigation) >= 1:
-        children = navigation[0].findChildren('li', {'class': 'page_number'})
+    navigation = soup.find('div', {'class': 'pagination3'})
+    if navigation is not None:
+        children = navigation.findChildren('li', {'class': 'page_number'})
         pages = len(children) + 1
     else:
         pages = 1
@@ -179,8 +179,8 @@ def get_public_user_video_viewkeys(user):
     next_url = url
     while current_page <= pages:
         print(f'Crawling {next_url}')
-        wrapper = soup.find_all('div', {'class': 'videoUList'})[0]
-        videos = wrapper.find_all('ul')[0]
+        wrapper = soup.find('div', {'class': 'videoUList'})
+        videos = wrapper.find('ul')
 
         for video in videos.find_all('li'):
             keys.append(video['_vkey'])
