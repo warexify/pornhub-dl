@@ -10,8 +10,8 @@ from pornhub.scraping import get_soup, download_video
 
 def download_user_videos(session, user):
     """Download all videos of a user."""
-    viewkeys = get_user_video_viewkeys(user)
-    secondary_viewkeys = get_secondary_user_video_viewkeys(user)
+    viewkeys = get_recent_video_viewkeys(user)
+    secondary_viewkeys = get_public_user_video_viewkeys(user)
     viewkeys = set(viewkeys + secondary_viewkeys)
 
     print(f'Found {len(viewkeys)} videos.')
@@ -59,7 +59,7 @@ def get_secondary_user_video_url(user_type, key):
 def get_user_info(key):
     """Get all necessary user information."""
     user_type, url, soup = get_user_type_and_url(key)
-    name = get_name_from_soup(soup, 'user')
+    name = get_user_name_from_soup(soup, 'user')
 
     name = name.strip()
     name = name.replace(' ', '_')
@@ -87,30 +87,39 @@ def get_user_type_and_url(key):
     raise Exception(f"Couldn't detect type for user {key}")
 
 
-def get_name_from_soup(soup, website_type):
+def get_user_name_from_soup(soup, website_type):
     """Get the name of the user by website."""
-    if website_type == 'channel':
-        section = soup.find_all('section', {'class': 'channelsProfile'})[0]
-        wrapper = section.find_all('div', {'class': 'bottomExtendedWrapper'})[0]
-        h1 = wrapper.find_all('h1')[0]
-        a = h1.find_all('a')[0]
-        name = a.contents[0]
+#    if website_type == 'channel':
+#        section = soup.find_all('section', {'class': 'channelsProfile'})[0]
+#        wrapper = section.find_all('div', {'class': 'bottomExtendedWrapper'})[0]
+#        h1 = wrapper.find_all('h1')[0]
+#        a = h1.find_all('a')[0]
+#        name = a.contents[0]
+#
+#    elif website_type == 'video':
+#        info = soup.find_all('div', {'class': 'video-detailed-info'})[0]
+#        wrap = info.find_all('div', {'class': 'usernameWrap'})[0]
+#        h1 = wrap.find_all('a')[0]
+#        name = h1.contents[0]
 
-    elif website_type == 'user':
-        div = soup.find_all('div', {'class': 'nameSubscribe'})[0]
-        h1 = div.find_all('h1')[0]
-        name = h1.contents[0]
+    profileHeader = soup.find('topProfileHeader')
 
-    elif website_type == 'video':
-        info = soup.find_all('div', {'class': 'video-detailed-info'})[0]
-        wrap = info.find_all('div', {'class': 'usernameWrap'})[0]
-        h1 = wrap.find_all('a')[0]
-        name = h1.contents[0]
+    # Try to get the user name from subscription element
+    div = profileHeader.find_all('div', {'class': 'nameSubscribe'})
+    if len(div) == 1:
+        h1 = div[0].find_all('h1')[0]
+        return h1.text
 
-    return name
+    # Try to get the user name  from normal profile
+    div = profileHeader.find_all('div', {'class': 'profileUserName'})
+    if len(div) == 1:
+        a = div[0].find_all('a')[0]
+        return a.text
+
+    return None
 
 
-def get_user_video_viewkeys(user):
+def get_recent_video_viewkeys(user):
     """Scrape all viewkeys of the user's videos."""
     url = get_user_video_url(user.user_type, user.key)
     soup = get_soup(url)
@@ -129,6 +138,10 @@ def get_user_video_viewkeys(user):
         print(f'Crawling {next_url}')
         videos = soup.find(id='mostRecentVideosSection')
 
+        # User has no most recent videos section
+        if videos is None:
+            return []
+
         for video in videos.find_all('li'):
             keys.append(video['_vkey'])
 
@@ -144,7 +157,7 @@ def get_user_video_viewkeys(user):
     return keys
 
 
-def get_secondary_user_video_viewkeys(user):
+def get_public_user_video_viewkeys(user):
     """Scrape all public viewkeys of the user's videos."""
     url = get_secondary_user_video_url(user.user_type, user.key)
 
