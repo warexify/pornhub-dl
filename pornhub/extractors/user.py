@@ -115,9 +115,9 @@ def get_user_video_viewkeys(user):
     url = get_user_video_url(user.user_type, user.key)
     soup = get_soup(url)
 
-    navigation = soup.find_all('div', {'class': 'pagination3'})[0]
+    navigation = soup.find_all('div', {'class': 'pagination3'})
     if len(navigation) >= 1:
-        children = navigation.findChildren('li', {'class': 'page_number'})
+        children = navigation[0].findChildren('li', {'class': 'page_number'})
         pages = len(children) + 1
     else:
         pages = 1
@@ -154,9 +154,9 @@ def get_secondary_user_video_viewkeys(user):
 
     soup = get_soup(url)
 
-    navigation = soup.find_all('div', {'class': 'pagination3'})[0]
+    navigation = soup.find_all('div', {'class': 'pagination3'})
     if len(navigation) >= 1:
-        children = navigation.findChildren('li', {'class': 'page_number'})
+        children = navigation[0].findChildren('li', {'class': 'page_number'})
         pages = len(children) + 1
     else:
         pages = 1
