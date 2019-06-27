@@ -60,9 +60,3 @@ def update(args):
         download_playlist_videos(session, playlist)
         user.last_scan = datetime.now()
         session.commit()
-
-
-
-def get_video(args):
-    """Download a single video."""
-    return

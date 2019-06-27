@@ -1,6 +1,6 @@
 """Commandline argument handling."""
 import argparse
-from pornhub.pornhub import update, create_user, get_video, create_playlist
+from pornhub.pornhub import update, create_user, create_playlist
 
 parser = argparse.ArgumentParser(description='Download your favorite pornhub stuff.')
 
@@ -11,9 +11,9 @@ subparsers = parser.add_subparsers(
 )
 
 # Get a specific video
-get_video_sp = subparsers.add_parser('video', help='Get a single pornhub video.')
-get_video_sp.add_argument('viewkey', type=str, help='The viewkey of the video (e.g ph5c8a344233560.')
-get_video_sp.set_defaults(func=get_video)
+# get_video_sp = subparsers.add_parser('video', help='Get a single pornhub video.')
+# get_video_sp.add_argument('viewkey', type=str, help='The viewkey of the video (e.g ph5c8a34423315012560.')
+# get_video_sp.set_defaults(func=)
 
 # Get all videos from a user
 get_user_sp = subparsers.add_parser('get_user', help='Get all videos from a user.')
