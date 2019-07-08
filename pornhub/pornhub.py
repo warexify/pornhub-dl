@@ -52,11 +52,13 @@ def update(args):
     playlists = session.query(Playlist).all()
 
     for user in users:
+        print(f'\nStart downloading user: {user.name}')
         download_user_videos(session, user)
         user.last_scan = datetime.now()
         session.commit()
 
     for playlist in playlists:
+        print(f'\nStart downloading playlist: {playlist.name}')
         download_playlist_videos(session, playlist)
         user.last_scan = datetime.now()
         session.commit()
