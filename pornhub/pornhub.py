@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pornhub.db import get_session
 from pornhub.models import User, Playlist
+from pornhub.scraping import download_video
 from pornhub.extractors import (
     get_user_info,
     get_playlist_info,
@@ -12,7 +13,7 @@ from pornhub.extractors import (
 )
 
 
-def create_user(args):
+def get_user(args):
     """Get all information about a user and download their videos."""
     key = args['key']
     session = get_session()
@@ -30,7 +31,7 @@ def create_user(args):
     session.commit()
 
 
-def create_playlist(args):
+def get_playlist(args):
     """Get all information about the playlist and download it's videos."""
     playlist_id = args['id']
     session = get_session()
@@ -42,6 +43,16 @@ def create_playlist(args):
 
     download_playlist_videos(session, playlist)
     playlist.last_scan = datetime.now()
+    session.commit()
+
+
+def get_video(args):
+    """Get a single videos."""
+    session = get_session()
+
+    url = f"https://www.pornhub.com/view_video.php?viewkey={args['viewkey']}"
+    download_video(url, name='single_videos')
+
     session.commit()
 
 
