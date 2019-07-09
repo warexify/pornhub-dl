@@ -16,13 +16,13 @@ get_video_sp.add_argument('viewkey', type=str, help='The viewkey of the video (e
 get_video_sp.set_defaults(func=get_video)
 
 # Get all videos from a user
-get_user_sp = subparsers.add_parser('get_user', help='Get all videos from a user.')
+get_user_sp = subparsers.add_parser('user', help='Get all videos from a user.')
 get_user_sp.add_argument(
     'key', type=str, help='The key of the user you want to download (name in url e.g. /model/lure-lady).')
 get_user_sp.set_defaults(func=get_user)
 
 # Get all videos from a playlist
-get_playlist_sp = subparsers.add_parser('get_playlist', help='Get all videos from a playlist.')
+get_playlist_sp = subparsers.add_parser('playlist', help='Get all videos from a playlist.')
 get_playlist_sp.add_argument(
     'id', type=str, help='The id of the playlist you want to download (number in url e.g. /playlists/51023901).')
 get_playlist_sp.set_defaults(func=get_playlist)
