@@ -37,7 +37,7 @@ def download_user_videos(session, user):
 
 def get_user_video_url(user_type, key):
     """Compile the user videos url."""
-    return f'https://www.pornhub.com/{user_type}/{key}/videos'
+    return f'https://www.pornhub.com/{user_type}/{key}'
 
 
 def get_secondary_user_video_url(user_type, key):
@@ -136,14 +136,20 @@ def get_recent_video_viewkeys(user):
     next_url = url
     while current_page <= pages:
         print(f'Crawling {next_url}')
+        # Videos for normal users/models
         videos = soup.find(id='mostRecentVideosSection')
+
+        # Videos for pornstars
+        if videos is None:
+            videos = soup.find(id='pornstarsVideoSection')
 
         # User has no most recent videos section
         if videos is None:
             return []
 
         for video in videos.find_all('li'):
-            keys.append(video['_vkey'])
+            if video.has_attr('_vkey'):
+                keys.append(video['_vkey'])
 
         current_page += 1
         next_url = url + f'?page={current_page}'
@@ -179,11 +185,21 @@ def get_public_user_video_viewkeys(user):
     next_url = url
     while current_page <= pages:
         print(f'Crawling {next_url}')
+        # Videos for normal users/models
         wrapper = soup.find('div', {'class': 'videoUList'})
-        videos = wrapper.find('ul')
+
+        # Videos for pornstars
+        if wrapper is None:
+            videos = soup.find(id='pornstarsVideoSection')
+        else:
+            videos = wrapper.find('ul')
+
+        if videos is None:
+            return []
 
         for video in videos.find_all('li'):
-            keys.append(video['_vkey'])
+            if video.has_attr('_vkey'):
+                keys.append(video['_vkey'])
 
         current_page += 1
         next_url = url + f'?page={current_page}'
