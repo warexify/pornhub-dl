@@ -17,8 +17,9 @@ The project is used by invocing `runner.py`. In combination with poetry this loo
 
 There is a help for all commands, but here are some examples anyway:
 
-`runner.py get_user [some_model]` Follow this user/model/pornstar and download all videos.  
-`runner.py get_playlist [playlist_id]` Follow this user/model/pornstar and download all videos.  
+`runner.py user [some_model]` Follow this user/model/pornstar and download all videos.  
+`runner.py playlist [playlist_id]` Follow this user/model/pornstar and download all videos.  
+`runner.py video [vkey]` Download a single video by viewkey e.g. `1598008994`.  
 `runner.py update` Get the newest videos of all your followed models and channels.  
 
 
