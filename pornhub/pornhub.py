@@ -51,7 +51,8 @@ def get_video(args):
     session = get_session()
 
     url = f"https://www.pornhub.com/view_video.php?viewkey={args['viewkey']}"
-    download_video(url, name='single_videos')
+    folder = args.get('folder')
+    download_video(url, name=folder)
 
     session.commit()
 

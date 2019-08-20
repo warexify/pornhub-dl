@@ -32,7 +32,7 @@ def get_soup(url):
         return soup
 
 
-def download_video(video_url, name='default'):
+def download_video(video_url, name='single_videos'):
     """Download the video."""
     options = {
         'outtmpl': f'~/pornhub/{name}/%(title)s.%(ext)s',

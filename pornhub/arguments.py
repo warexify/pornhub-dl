@@ -13,7 +13,11 @@ subparsers = parser.add_subparsers(
 # Get a specific video
 get_video_sp = subparsers.add_parser('video', help='Get a single pornhub video.')
 get_video_sp.add_argument('viewkey', type=str, help='The viewkey of the video (e.g ph5c8a34423315012560.')
-get_video_sp.set_defaults(func=get_video)
+get_video_sp.add_argument('--folder', '-f', type=str, help="The folder to which it's saved. Default is `single_videos`")
+get_video_sp.set_defaults(
+    func=get_video,
+    folder='single_videos',
+)
 
 # Get all videos from a user
 get_user_sp = subparsers.add_parser('user', help='Get all videos from a user.')
@@ -28,6 +32,6 @@ get_playlist_sp.add_argument(
 get_playlist_sp.set_defaults(func=get_playlist)
 
 
-# Get new videos of all subscribed users/channels
-update_sp = subparsers.add_parser('update', help='Get new videos of all subscribed users/channels.')
+# Get new videos of all subscribed users
+update_sp = subparsers.add_parser('update', help='Get new videos of all subscribed users/playlists.')
 update_sp.set_defaults(func=update)
