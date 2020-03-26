@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pornhub.db import get_session
 from pornhub.models import User, Playlist
-from pornhub.scraping import download_video
+from pornhub.download import download_video
 from pornhub.extractors import (
     get_user_info,
     get_playlist_info,
@@ -50,9 +50,11 @@ def get_video(args):
     """Get a single videos."""
     session = get_session()
 
-    url = f"https://www.pornhub.com/view_video.php?viewkey={args['viewkey']}"
     folder = args.get('folder')
-    download_video(url, name=folder)
+    success, info = download_video(args['viewkey'], name=folder)
+
+    if success:
+        print(info)
 
     session.commit()
 

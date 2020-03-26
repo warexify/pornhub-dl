@@ -11,20 +11,21 @@ from pornhub.db import base
 
 
 class Clip(base):
-    """The sqlite model for a Movie."""
+    """The sqlite model for a Clip."""
 
     __tablename__ = 'movie'
 
     viewkey = Column(String, primary_key=True)
     user_key = Column(String, ForeignKey('user.key'), index=True)
     title = Column(String)
+    location = Column(String)
     completed = Column(Boolean, nullable=False, default=False)
     downloaded = Column(DateTime)
 
     user = relationship("User")
 
     def __init__(self, viewkey, user=None):
-        """Create a new Movie."""
+        """Create a new Clip."""
         self.viewkey = viewkey
         self.user = user
 

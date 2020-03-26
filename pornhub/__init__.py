@@ -11,8 +11,6 @@ def main():
 
     create_db()
 
-    # Check if pueue is available:
-    # command_factory('status')({}, root_dir=os.path.expanduser('~'))
     try:
         var_args = vars(args)
         if 'func' in var_args:

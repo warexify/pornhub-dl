@@ -3,9 +3,14 @@
 Download all videos of your favorite pornhub models, playlists and channels and update all your stuff with a simple command.
 
 ## Setup
-You will need `poetry` for dependency management and venv creation: `poetry install --develop .`
-The default config will create a new postgres database `pornhub`.
+1. You will need `poetry` for dependency management and venv creation: `poetry install --develop .`
+2. The default config will create a new postgres database `pornhub` when first running the program.
+Make sure your user has proper rights.
 If you want to change this, you need to adjust the sqluri in `db.py`.
+
+3. If you want to be up to date with migrations, set the alembic head to your current version.
+You can use this by utilizing `potry run alembic history` and `poetry run alembic stamp $stamp`
+
 
 ## Migrating
 
@@ -13,14 +18,14 @@ Just execute `poetry run alembic upgrade head`.
 If you use another database engine/nam, you need to adjust the sqluri in alembic.ini as well.
 
 ## Usage
-The project is used by invocing `runner.py`. In combination with poetry this looks like this: `poetry run python runner.py`  
+The project is used by invocing `pornhub_dl.py`. In combination with poetry this looks like this: `poetry run python runner.py`  
 
 There is a help for all commands, but here are some examples anyway:
 
-`runner.py user [some_model]` Follow this user/model/pornstar and download all videos.  
-`runner.py playlist [playlist_id]` Follow this user/model/pornstar and download all videos.  
-`runner.py video [vkey]` Download a single video by viewkey e.g. `1598008994`.  
-`runner.py update` Get the newest videos of all your followed models and channels.  
+`pornhub_dl.py user [some_model]` Follow this user/model/pornstar and download all videos.  
+`pornhub_dl.py playlist [playlist_id]` Follow this user/model/pornstar and download all videos.  
+`pornhub_dl.py video [vkey]` Download a single video by viewkey e.g. `1598008994`.  
+`pornhub_dl.py update` Get the newest videos of all your followed models and channels.  
 
 
 ## How does it work?
@@ -38,3 +43,11 @@ Disclaimer:
 
 This project is not associated in any way with the operators of the official pornhub.com
 It's just a small and fun side-project in reaction to the possibly imminent censorship in the EU.
+
+
+## Premium
+
+To enable premium, copy your Pornhub cookies and paste them to `./cookie_file`.
+The cookie file can be, for instance, created with his tool:
+
+https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/

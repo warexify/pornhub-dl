@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pornhub.models import User, Clip
-from pornhub.scraping import get_soup, download_video
+from pornhub.download import get_soup, download_video
 
 
 def download_user_videos(session, user):
@@ -22,9 +22,7 @@ def download_user_videos(session, user):
         if clip.completed and clip.user == user:
             continue
 
-        url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
-
-        success, info = download_video(url, user.name)
+        success, info = download_video(viewkey, user.name)
         if success:
             clip.title = info['title']
             clip.completed = True

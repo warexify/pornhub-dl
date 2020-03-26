@@ -3,8 +3,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from pornhub.scraping import get_soup, download_video
 from pornhub.models import Clip
+from pornhub.download import get_soup, download_video
 
 
 def download_playlist_videos(session, playlist):
@@ -18,9 +18,7 @@ def download_playlist_videos(session, playlist):
         if clip.completed:
             continue
 
-        url = f'https://www.pornhub.com/view_video.php?viewkey={viewkey}'
-
-        success, info = download_video(url, f'playlists/{playlist.name}')
+        success, info = download_video(viewkey, f'playlists/{playlist.name}')
         if success:
             clip.title = info['title']
             clip.completed = True

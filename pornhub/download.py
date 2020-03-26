@@ -1,4 +1,5 @@
 """Module for actually getting data and downloading videos from Pornhub."""
+import os
 import time
 import traceback
 import requests
@@ -7,12 +8,34 @@ from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
 
+def get_video_url(viewkey):
+    """Get the correct url, depending on if the user specified cookies for a premium account."""
+
+def get_cookies():
+    """Get the cookies from the cookie_file"""
+    if not os.path.exists('cookie_file'):
+        return None
+
+    with open('cookie_file') as f:
+        cookie_data = f.read()
+
+    return cookie_data
+
 def get_soup(url):
     """Get new soup instance from url."""
+    with open('workfile') as f:
+        read_data = f.read()
     tries = 0
     while True:
         try:
-            response = requests.get(url)
+            headers = {
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0",
+            }
+            cookie_data = get_cookies()
+            if cookie_data is not None:
+                headers['Cookie'] = cookie_data
+
+            response = requests.get(url, headers=headers)
 
             # Couldn't find the site. Stop and return None
             if response.status_code == 404:
@@ -32,13 +55,23 @@ def get_soup(url):
         return soup
 
 
-def download_video(video_url, name='single_videos'):
+def download_video(viewkey, name='single_videos'):
     """Download the video."""
+    # Decide which domain should be used, depending if the user has a premium account
+    is_premium = os.path.exists('cookie_file')
+    if is_premium:
+        video_url = f"https://www.pornhubpremium.com/view_video.php?viewkey={viewkey}"
+    else:
+        video_url = f"https://www.pornhub.com/view_video.php?viewkey={viewkey}"
+
     options = {
         'outtmpl': f'~/pornhub/{name}/%(title)s.%(ext)s',
         'format': 'best',
         'quiet': True,
     }
+    if is_premium:
+        options['cookiefile'] = 'cookie_file'
+
     ydl = youtube_dl.YoutubeDL(options)
     tries = 0
     while True:
