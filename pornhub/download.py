@@ -78,6 +78,7 @@ def download_video(viewkey, name='single_videos'):
         try:
             print(f'Start downloading: {video_url}')
             info = ydl.extract_info(video_url)
+            info['out_path'] = f'~/pornhub/{name}/{info["title"]}.{info["ext"]}'
             return True, info
         except TypeError:
             # This is an error that seems to occurr from time to time

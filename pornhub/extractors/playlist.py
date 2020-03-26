@@ -22,6 +22,7 @@ def download_playlist_videos(session, playlist):
         if success:
             clip.title = info['title']
             clip.completed = True
+            clip.location = info['out_path']
 
             print(f'New video: {clip.title}')
 

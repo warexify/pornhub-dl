@@ -27,6 +27,7 @@ def download_user_videos(session, user):
             clip.title = info['title']
             clip.completed = True
             clip.user = user
+            clip.location = info['out_path']
 
             print(f'New video: {clip.title}')
 

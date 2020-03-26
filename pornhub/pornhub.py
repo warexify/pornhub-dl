@@ -54,8 +54,11 @@ def get_video(args):
     folder = args.get('folder')
     success, info = download_video(args['viewkey'], name=folder)
 
-    if success:
-        print(info)
+    clip = Clip.get_or_create(session, viewkey)
+    clip.title = info['title']
+    clip.completed = True
+    clip.location = info['out_path']
+
 
     session.commit()
 
