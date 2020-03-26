@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pornhub.models import User, Clip
+from pornhub.helper import get_clip_path, symlink_duplicate
 from pornhub.download import get_soup, download_video
 
 
@@ -20,7 +21,12 @@ def download_user_videos(session, user):
         clip = Clip.get_or_create(session, viewkey, user)
 
         # The clip has already been downloaded, skip it.
-        if clip.completed and clip.user == user:
+        if clip.completed:
+            if clip.title is not None and \
+               clip.extension is not None:
+                target_path = get_clip_path(user.name, clip.title, clip.extension)
+                symlink_duplicate(clip, target_path)
+
             continue
 
         success, info = download_video(viewkey, user.name)
@@ -29,10 +35,12 @@ def download_user_videos(session, user):
             clip.completed = True
             clip.user = user
             clip.location = info['out_path']
+            clip.extension = info['ext']
 
             print(f'New video: {clip.title}')
 
         session.commit()
+        time.sleep(20)
 
 
 def get_user_video_url(user_type, key):

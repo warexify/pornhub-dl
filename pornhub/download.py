@@ -9,6 +9,11 @@ from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
 
+def get_clip_path(folder, title, extension):
+    """Get a path for a clip by folder and title."""
+    return f"~/pornhub/{folder}/{title}.{extension}"
+
+
 def get_cookies():
     """Get the cookies from the cookie_file"""
     if not os.path.exists('http_cookie_file'):
@@ -67,6 +72,7 @@ def download_video(viewkey, name='single_videos'):
         'outtmpl': f'~/pornhub/{name}/%(title)s.%(ext)s',
         'format': 'best',
         'quiet': True,
+        'retries': 3
     }
     if is_premium:
         options['cookiefile'] = 'cookie_file'

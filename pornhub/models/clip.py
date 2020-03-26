@@ -18,6 +18,7 @@ class Clip(base):
     viewkey = Column(String, primary_key=True)
     user_key = Column(String, ForeignKey('user.key'), index=True)
     title = Column(String)
+    extension = Column(String)
     location = Column(String)
     completed = Column(Boolean, nullable=False, default=False)
     downloaded = Column(DateTime)

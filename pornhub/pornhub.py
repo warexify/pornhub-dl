@@ -14,6 +14,7 @@ from pornhub.extractors import (
 )
 
 
+
 def get_user(args):
     """Get all information about a user and download their videos."""
     key = args['key']
@@ -52,12 +53,23 @@ def get_video(args):
     session = get_session()
 
     folder = args.get('folder')
-    success, info = download_video(args['viewkey'], name=folder)
 
     clip = Clip.get_or_create(session, viewkey)
+    if clip.completed:
+        if clip.title is not None and \
+           clip.extension is not None:
+            target_path = get_clip_path(folder, clip.title, clip.extension)
+            symlink_duplicate(clip, target_path)
+
+        print("Clip already exists")
+        return
+
+    success, info = download_video(args['viewkey'], name=folder)
+
     clip.title = info['title']
     clip.completed = True
     clip.location = info['out_path']
+    clip.extension = info['ext']
 
 
     session.commit()
