@@ -1,5 +1,6 @@
 """Module for actually getting data and downloading videos from Pornhub."""
 import os
+import http
 import time
 import traceback
 import requests
@@ -8,34 +9,32 @@ from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
 
-def get_video_url(viewkey):
-    """Get the correct url, depending on if the user specified cookies for a premium account."""
-
 def get_cookies():
     """Get the cookies from the cookie_file"""
-    if not os.path.exists('cookie_file'):
+    if not os.path.exists('http_cookie_file'):
         return None
 
-    with open('cookie_file') as f:
+    cookies_jar = {}
+    with open('http_cookie_file') as f:
         cookie_data = f.read()
 
-    return cookie_data
+    cookies = cookie_data.split(';')
+    for cookie in cookies:
+        [key, value] = cookie.strip().split('=', 1)
+        cookies_jar[key] = value
+
+    return cookies_jar
 
 def get_soup(url):
     """Get new soup instance from url."""
-    with open('workfile') as f:
-        read_data = f.read()
     tries = 0
     while True:
         try:
             headers = {
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0",
             }
-            cookie_data = get_cookies()
-            if cookie_data is not None:
-                headers['Cookie'] = cookie_data
-
-            response = requests.get(url, headers=headers)
+            cookies = get_cookies()
+            response = requests.get(url, headers=headers, cookies=cookies)
 
             # Couldn't find the site. Stop and return None
             if response.status_code == 404:

@@ -1,5 +1,6 @@
 """Helper for extracting meta information from pornhub."""
 import re
+import os
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -36,15 +37,26 @@ def download_user_videos(session, user):
 
 def get_user_video_url(user_type, key):
     """Compile the user videos url."""
+    is_premium = os.path.exists('http_cookie_file')
+    if is_premium:
+        return f'https://www.pornhubpremium.com/{user_type}/{key}'
+
     return f'https://www.pornhub.com/{user_type}/{key}'
 
 
 def get_secondary_user_video_url(user_type, key):
     """Check if there is a secondary video url."""
-    possible_urls = [
-        f'https://www.pornhub.com/{user_type}/{key}/videos/public',
-        f'https://www.pornhub.com/{user_type}/{key}/videos/upload',
-    ]
+    is_premium = os.path.exists('http_cookie_file')
+    if is_premium:
+        possible_urls = [
+            f'https://www.pornhubpremium.com/{user_type}/{key}/videos/upload',
+            f'https://www.pornhubpremium.com/{user_type}/{key}/videos/public',
+        ]
+    else:
+        possible_urls = [
+            f'https://www.pornhub.com/{user_type}/{key}/videos/upload',
+            f'https://www.pornhub.com/{user_type}/{key}/videos/public',
+        ]
 
     for url in possible_urls:
         response = requests.get(url)
@@ -123,17 +135,10 @@ def get_recent_video_viewkeys(user):
     url = get_user_video_url(user.user_type, user.key)
     soup = get_soup(url)
 
-    navigation = soup.find('div', {'class': 'pagination3'})
-    if navigation is not None:
-        children = navigation.findChildren('li', {'class': 'page_number'})
-        pages = len(children) + 1
-    else:
-        pages = 1
-
     keys = []
     current_page = 1
     next_url = url
-    while current_page <= pages:
+    while True:
         print(f'Crawling {next_url}')
         # Videos for normal users/models
         videos = soup.find(id='mostRecentVideosSection')
@@ -172,17 +177,10 @@ def get_public_user_video_viewkeys(user):
 
     soup = get_soup(url)
 
-    navigation = soup.find('div', {'class': 'pagination3'})
-    if navigation is not None:
-        children = navigation.findChildren('li', {'class': 'page_number'})
-        pages = len(children) + 1
-    else:
-        pages = 1
-
     keys = []
     current_page = 1
     next_url = url
-    while current_page <= pages:
+    while True:
         print(f'Crawling {next_url}')
         # Videos for normal users/models
         wrapper = soup.find('div', {'class': 'videoUList'})

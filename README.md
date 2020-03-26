@@ -48,6 +48,12 @@ It's just a small and fun side-project in reaction to the possibly imminent cens
 ## Premium
 
 To enable premium, copy your Pornhub cookies and paste them to `./cookie_file`.
+The cookies file must be formatted after the `Netscape cookie file format`.
 The cookie file can be, for instance, created with his tool:
 
 https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/
+
+
+On top of that, create a second file `http_cookie_file`
+Simply copy the `Cookie` header of any logged in pornhub premium domain request.
+Those can be extracted using your browser's network debugging tool.

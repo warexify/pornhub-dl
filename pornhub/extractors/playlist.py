@@ -31,6 +31,10 @@ def download_playlist_videos(session, playlist):
 
 def get_playlist_video_url(playlist_id):
     """Compile the user videos url."""
+    is_premium = os.path.exists('http_cookie_file')
+    if is_premium:
+        return f'https://www.pornhubpremium.com/playlist/{playlist_id}'
+
     return f'https://www.pornhub.com/playlist/{playlist_id}'
 
 
@@ -57,7 +61,7 @@ def get_playlist_info(playlist_id):
 
 def get_playlist_video_viewkeys(playlist):
     """Scrape all viewkeys of the playlist's videos."""
-    url = f'https://www.pornhub.com/playlist/{playlist.id}'
+    url = get_playlist_video_url(playlist.id)
     soup = get_soup(url)
 
     videos = soup.find(id='videoPlaylist')
