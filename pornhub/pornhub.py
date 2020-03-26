@@ -1,9 +1,10 @@
 #!/bin/env python3
 """A scraper for pornhub."""
+import os
 from datetime import datetime
 
 from pornhub.db import get_session
-from pornhub.models import User, Playlist
+from pornhub.models import User, Playlist, Clip
 from pornhub.download import download_video
 from pornhub.extractors import (
     get_user_info,
@@ -63,7 +64,6 @@ def update(args):
     """Get all information about a user and download their videos."""
     session = get_session()
     users = session.query(User).all()
-    playlists = session.query(Playlist).all()
 
     for user in users:
         print(f'\nStart downloading user: {user.name}')
@@ -71,8 +71,30 @@ def update(args):
         user.last_scan = datetime.now()
         session.commit()
 
+    playlists = session.query(Playlist).all()
     for playlist in playlists:
         print(f'\nStart downloading playlist: {playlist.name}')
         download_playlist_videos(session, playlist)
         user.last_scan = datetime.now()
         session.commit()
+
+    clips = (
+        session.query(Clip)
+            .filter(Clip.completed.is_(False))
+            .filter(Clip.location.isnot(None))
+            .all()
+    )
+
+    for clip in clips:
+        download_video(clip.viewkey, name=os.path.dirname(clip.location))
+        clip.completed = True
+        session.commit()
+
+
+def reset(args):
+    """Get all information about a user and download their videos."""
+    session = get_session()
+    session.query(Clip).update({"completed": False})
+    session.commit()
+
+    print("All videos have been scheduled for new download. Please run `update` to start downloading.")

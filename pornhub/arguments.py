@@ -1,6 +1,12 @@
 """Commandline argument handling."""
 import argparse
-from pornhub.pornhub import update, get_user, get_playlist, get_video
+from pornhub.pornhub import (
+    get_playlist,
+    get_user,
+    get_video,
+    reset,
+    update,
+)
 
 parser = argparse.ArgumentParser(description='Download your favorite pornhub stuff.')
 
@@ -35,3 +41,7 @@ get_playlist_sp.set_defaults(func=get_playlist)
 # Get new videos of all subscribed users
 update_sp = subparsers.add_parser('update', help='Get new videos of all subscribed users/playlists.')
 update_sp.set_defaults(func=update)
+
+# Reset all videos and download them again
+reset_sp = subparsers.add_parser('reset', help='Schedule all videos to be downloaded again.')
+reset_sp.set_defaults(func=reset)
