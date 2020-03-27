@@ -67,6 +67,11 @@ def get_channel_info(channel_id):
         raise Exception("Got invalid response for channel")
 
     profile = soup.find(id='channelsProfile')
+    if profile is None:
+        logger.info("Couldn't get info for channel")
+        check_logged_out(soup)
+        sys.exit(1)
+
     header = profile.find('div', {'class': 'header'})
     wrapper = profile.find('div', {'class': 'bottomExtendedWrapper'})
     title = profile.find('div', {'class': 'title'})
