@@ -9,11 +9,6 @@ from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
 
-def get_clip_path(folder, title, extension):
-    """Get a path for a clip by folder and title."""
-    return f"~/pornhub/{folder}/{title}.{extension}"
-
-
 def get_cookies():
     """Get the cookies from the cookie_file"""
     if not os.path.exists('http_cookie_file'):
@@ -30,6 +25,7 @@ def get_cookies():
 
     return cookies_jar
 
+
 def get_soup(url):
     """Get new soup instance from url."""
     tries = 0
@@ -42,7 +38,7 @@ def get_soup(url):
             response = requests.get(url, headers=headers, cookies=cookies)
 
             # Couldn't find the site. Stop and return None
-            if response.status_code == 404:
+            if response.status_code != 200:
                 return None
 
             soup = BeautifulSoup(response.text, 'html.parser')

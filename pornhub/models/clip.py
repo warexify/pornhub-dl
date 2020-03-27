@@ -1,4 +1,4 @@
-"""The sqlite model for a Movie."""
+"""The db model for a Movie."""
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import (

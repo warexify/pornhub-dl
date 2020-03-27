@@ -78,7 +78,7 @@ def get_video(args):
 def update(args):
     """Get all information about a user and download their videos."""
     session = get_session()
-    users = session.query(User).all()
+    users = session.query(User).order_by(User.key).all()
 
     for user in users:
         print(f'\nStart downloading user: {user.name}')
@@ -86,7 +86,7 @@ def update(args):
         user.last_scan = datetime.now()
         session.commit()
 
-    playlists = session.query(Playlist).all()
+    playlists = session.query(Playlist).order_by(Playlist.name).all()
     for playlist in playlists:
         print(f'\nStart downloading playlist: {playlist.name}')
         download_playlist_videos(session, playlist)

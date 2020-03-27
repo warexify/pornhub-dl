@@ -1,6 +1,7 @@
 """Helper for extracting meta information from pornhub."""
 import re
 import os
+import sys
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -12,9 +13,9 @@ from pornhub.download import get_soup, download_video
 
 def download_user_videos(session, user):
     """Download all videos of a user."""
-    viewkeys = get_recent_video_viewkeys(user)
-    secondary_viewkeys = get_public_user_video_viewkeys(user)
-    viewkeys = set(viewkeys + secondary_viewkeys)
+    video_viewkeys = get_user_video_viewkeys(user)
+    video_upload_viewkeys = get_video_upload_viewkeys(user)
+    viewkeys = set(video_viewkeys + video_upload_viewkeys)
 
     print(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
@@ -26,6 +27,10 @@ def download_user_videos(session, user):
                clip.extension is not None:
                 target_path = get_clip_path(user.name, clip.title, clip.extension)
                 symlink_duplicate(clip, target_path)
+
+            if clip.user is None:
+                clip.user = user
+                session.commit()
 
             continue
 
@@ -41,38 +46,6 @@ def download_user_videos(session, user):
 
         session.commit()
         time.sleep(20)
-
-
-def get_user_video_url(user_type, key):
-    """Compile the user videos url."""
-    is_premium = os.path.exists('http_cookie_file')
-    if is_premium:
-        return f'https://www.pornhubpremium.com/{user_type}/{key}'
-
-    return f'https://www.pornhub.com/{user_type}/{key}'
-
-
-def get_secondary_user_video_url(user_type, key):
-    """Check if there is a secondary video url."""
-    is_premium = os.path.exists('http_cookie_file')
-    if is_premium:
-        possible_urls = [
-            f'https://www.pornhubpremium.com/{user_type}/{key}/videos/upload',
-            f'https://www.pornhubpremium.com/{user_type}/{key}/videos/public',
-        ]
-    else:
-        possible_urls = [
-            f'https://www.pornhub.com/{user_type}/{key}/videos/upload',
-            f'https://www.pornhub.com/{user_type}/{key}/videos/public',
-        ]
-
-    for url in possible_urls:
-        response = requests.get(url)
-        if response.status_code == 200:
-            return url
-
-    print(f'No public/upload site for user {key}.')
-    return None
 
 
 def get_user_info(key):
@@ -108,19 +81,6 @@ def get_user_type_and_url(key):
 
 def get_user_name_from_soup(soup, website_type):
     """Get the name of the user by website."""
-#    if website_type == 'channel':
-#        section = soup.find_all('section', {'class': 'channelsProfile'})[0]
-#        wrapper = section.find_all('div', {'class': 'bottomExtendedWrapper'})[0]
-#        h1 = wrapper.find_all('h1')[0]
-#        a = h1.find_all('a')[0]
-#        name = a.contents[0]
-#
-#    elif website_type == 'video':
-#        info = soup.find_all('div', {'class': 'video-detailed-info'})[0]
-#        wrap = info.find_all('div', {'class': 'usernameWrap'})[0]
-#        h1 = wrap.find_all('a')[0]
-#        name = h1.contents[0]
-
     profileHeader = soup.find('section', {'class': 'topProfileHeader'})
 
     # Try to get the user name from subscription element
@@ -138,24 +98,43 @@ def get_user_name_from_soup(soup, website_type):
     return None
 
 
-def get_recent_video_viewkeys(user):
-    """Scrape all viewkeys of the user's videos."""
-    url = get_user_video_url(user.user_type, user.key)
+def get_user_video_url(user_type, key):
+    """Compile the user videos url."""
+    is_premium = os.path.exists('http_cookie_file')
+    if is_premium:
+        return f'https://www.pornhubpremium.com/{user_type}/{key}'
+
+    return f'https://www.pornhub.com/{user_type}/{key}'
+
+
+def get_user_video_viewkeys(user):
+    """Scrape viewkeys from the user's user/videos route."""
+    is_premium = os.path.exists('http_cookie_file')
+    if is_premium:
+        url = f'https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos'
+    else:
+        url = f'https://www.pornhub.com/{user.user_type}/{user.key}/videos'
+
     soup = get_soup(url)
+    if soup is None:
+        print(f"Nothing on {url}")
+        return []
+
+    navigation = soup.find('div', {'class': 'pagination3'})
+    if navigation is not None:
+        children = navigation.findChildren('li', {'class': 'page_number'})
+        pages = len(children) + 1
+    else:
+        pages = 1
 
     keys = []
     current_page = 1
     next_url = url
-    while True:
+    while current_page <= pages:
         print(f'Crawling {next_url}')
-        # Videos for normal users/models
-        videos = soup.find(id='mostRecentVideosSection')
+        # Users with normal video upload list
+        videos = soup.find('div', {'class': 'mostRecentVideosSection'})
 
-        # Videos for pornstars
-        if videos is None:
-            videos = soup.find(id='pornstarsVideoSection')
-
-        # User has no most recent videos section
         if videos is None:
             return []
 
@@ -167,6 +146,7 @@ def get_recent_video_viewkeys(user):
         next_url = url + f'?page={current_page}'
 
         time.sleep(4)
+
         soup = get_soup(next_url)
         # We couldn't get the next url.
         if soup is None:
@@ -175,29 +155,34 @@ def get_recent_video_viewkeys(user):
     return keys
 
 
-def get_public_user_video_viewkeys(user):
-    """Scrape all public viewkeys of the user's videos."""
-    url = get_secondary_user_video_url(user.user_type, user.key)
-
-    # Couldn't find a public/upload video site
-    if url is None:
-        return []
+def get_video_upload_viewkeys(user):
+    """Scrape viewkeys from the user's user/videos/upload route."""
+    is_premium = os.path.exists('http_cookie_file')
+    if is_premium:
+        url = f'https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/upload'
+    else:
+        url = f'https://www.pornhub.com/{user.user_type}/{user.key}/videos/upload'
 
     soup = get_soup(url)
+    if soup is None:
+        print(f"Nothing on {url}")
+        return []
+
+    navigation = soup.find('div', {'class': 'pagination3'})
+    if navigation is not None:
+        children = navigation.findChildren('li', {'class': 'page_number'})
+        pages = len(children) + 1
+    else:
+        pages = 1
 
     keys = []
     current_page = 1
     next_url = url
-    while True:
+    while current_page <= pages:
         print(f'Crawling {next_url}')
-        # Videos for normal users/models
+        # Users with normal video upload list
         wrapper = soup.find('div', {'class': 'videoUList'})
-
-        # Videos for pornstars
-        if wrapper is None:
-            videos = soup.find(id='pornstarsVideoSection')
-        else:
-            videos = wrapper.find('ul')
+        videos = wrapper.find(id='moreData')
 
         if videos is None:
             return []

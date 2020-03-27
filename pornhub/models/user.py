@@ -1,4 +1,4 @@
-"""The sqlite model for a user."""
+"""The db model for a user."""
 from sqlalchemy import Column, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import (

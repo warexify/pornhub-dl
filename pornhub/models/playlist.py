@@ -1,4 +1,4 @@
-"""The sqlite model for a playlist."""
+"""The db model for a playlist."""
 from sqlalchemy import Column, func
 from sqlalchemy.types import (
     DateTime,
