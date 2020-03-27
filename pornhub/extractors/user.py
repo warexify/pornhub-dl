@@ -185,7 +185,7 @@ def get_video_upload_viewkeys(user):
         # Users with normal video upload list
         videoSection = soup.find('div', {'class': 'videoUList'})
         pornstarVideoSection = soup.find(id='pornstarsVideoSection')
-        if videoSection is None:
+        if videoSection is not None:
             videos = videoSection.find(id='moreData')
         # Users with pornstarVideoSection
         elif pornstarVideoSection is not None:
