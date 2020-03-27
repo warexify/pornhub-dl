@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pornhub.models import Clip
-from pornhub.helper import get_clip_path, symlink_duplicate
+from pornhub.helper import get_clip_path, link_duplicate
 from pornhub.download import get_soup, download_video
 
 
@@ -21,7 +21,7 @@ def download_playlist_videos(session, playlist):
             if clip.title is not None and \
                clip.extension is not None:
                 target_path = get_clip_path(playlist.name, clip.title, clip.extension)
-                symlink_duplicate(clip, target_path)
+                link_duplicate(clip, target_path)
 
             continue
 

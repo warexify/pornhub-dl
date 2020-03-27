@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 
 from pornhub.db import get_session
+from pornhub.helper import link_duplicate
 from pornhub.models import User, Playlist, Clip
 from pornhub.download import download_video
 from pornhub.extractors import (
@@ -59,7 +60,7 @@ def get_video(args):
         if clip.title is not None and \
            clip.extension is not None:
             target_path = get_clip_path(folder, clip.title, clip.extension)
-            symlink_duplicate(clip, target_path)
+            link_duplicate(clip, target_path)
 
         print("Clip already exists")
         return

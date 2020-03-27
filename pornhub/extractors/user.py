@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pornhub.models import User, Clip
-from pornhub.helper import get_clip_path, symlink_duplicate
+from pornhub.helper import get_clip_path, link_duplicate
 from pornhub.download import get_soup, download_video
 
 
@@ -26,7 +26,7 @@ def download_user_videos(session, user):
             if clip.title is not None and \
                clip.extension is not None:
                 target_path = get_clip_path(user.name, clip.title, clip.extension)
-                symlink_duplicate(clip, target_path)
+                link_duplicate(clip, target_path)
 
             if clip.user is None:
                 clip.user = user

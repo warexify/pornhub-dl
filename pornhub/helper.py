@@ -6,7 +6,7 @@ def get_clip_path(folder, title, extension):
     return f"~/pornhub/{folder}/{title}.{extension}"
 
 
-def symlink_duplicate(clip, new_path):
+def link_duplicate(clip, new_path):
     """Handle multiple references to a clip
 
     If a clip has already been downloaded, but is used in another source as well,
