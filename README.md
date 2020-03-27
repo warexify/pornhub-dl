@@ -36,11 +36,14 @@ Pornhub-dl uses youtube-dl as a download backend, but implements own functionali
 Pornhub-dl crawls all video urls of all followed users/channels and remembers the ids of downloaded videos.
 If you update your database, all new videos will be downloaded, while old ones are simply skipped without invoking youtube-dl.
 
-## Files and Directories
-Videos are downloaded to `~/pornhub/`. A sqlite database is created in `~/.local/share/pornhub.db`.
+## Configuration
+When starting the downloader for the first time, a configuration file is created at `~/.config/pornhub_dl.toml`
+
+
+- `location`: Video download location. Default: `~/pornhub/`
+- `sql_uri`: Your sql location. Default: `'postgres://localhost/pollbot'`
 
 Disclaimer:
-
 This project is not associated in any way with the operators of the official pornhub.com
 It's just a small and fun side-project in reaction to the possibly imminent censorship in the EU.
 

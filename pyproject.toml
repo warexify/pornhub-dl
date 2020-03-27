@@ -15,25 +15,7 @@ alembic = "^1.4"
 SQLAlchemy = "^1.3"
 sqlalchemy-utils = "^0.36"
 psycopg2-binary = "^2.8"
-
-[tool.poetry.dev-dependencies]
-# Linting
-flake8 = "*"
-flake8-docstrings = "*"
-flake8-print = "*"
-flake8-commas = "*"
-flake8-bugbear = "*"
-flake8-string-format = "*"
-
-# Testing
-pytest = "*"
-pytest-cov = "*"
-pytest-greendots = "*"
-pytest-watch = "*"
-hypothesis = "*"
-
-# Niceness
-ipython = "*"
+toml = "^0.10"
 
 [build-system]
 requires = ["poetry>=0.12"]
