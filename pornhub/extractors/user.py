@@ -122,17 +122,30 @@ def get_user_video_viewkeys(user):
         print(f"Nothing on {url}")
         return []
 
+    hasNavigation = False
+    hasEndlessScrolling = False
+
+    pages = 1
+    # Some sites have a navigation at the bottom
     navigation = soup.find('div', {'class': 'pagination3'})
     if navigation is not None:
         children = navigation.findChildren('li', {'class': 'page_number'})
         pages = len(children) + 1
-    else:
-        pages = 1
+        hasNavigation = True
+    # Others have a button for "endless scrolling"
+    # In that case we have to search as long as 
+    elif soup.find(id='moreDataBtnStream'):
+        hasEndlessScrolling = True
 
     keys = []
     current_page = 1
     next_url = url
     while current_page <= pages:
+        # Check if the next site has another "endless scrolling" button as qell
+        # If that's the case, increase the counter
+        if hasEndlessScrolling and soup.find(id='moreDataBtnStream'):
+            pages += 1
+
         print(f'Crawling {next_url}')
         # Users with normal video upload list
         videos = soup.find('div', {'class': 'mostRecentVideosSection'})
@@ -170,17 +183,30 @@ def get_video_upload_viewkeys(user):
         print(f"Nothing on {url}")
         return []
 
+    hasNavigation = False
+    hasEndlessScrolling = False
+
+    pages = 1
+    # Some sites have a navigation at the bottom
     navigation = soup.find('div', {'class': 'pagination3'})
     if navigation is not None:
         children = navigation.findChildren('li', {'class': 'page_number'})
         pages = len(children) + 1
-    else:
-        pages = 1
+        hasNavigation = True
+    # Others have a button for "endless scrolling"
+    # In that case we have to search as long as 
+    elif soup.find(id='moreDataBtnStream'):
+        hasEndlessScrolling = True
 
     keys = []
     current_page = 1
     next_url = url
     while current_page <= pages:
+        # Check if the next site has another "endless scrolling" button as qell
+        # If that's the case, increase the counter
+        if hasEndlessScrolling and soup.find(id='moreDataBtnStream'):
+            pages += 1
+
         print(f'Crawling {next_url}')
         # Users with normal video upload list
         videoSection = soup.find('div', {'class': 'videoUList'})
