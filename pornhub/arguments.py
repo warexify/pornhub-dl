@@ -1,6 +1,7 @@
 """Commandline argument handling."""
 import argparse
 from pornhub.pornhub import (
+    get_channel,
     get_playlist,
     get_user,
     get_video,
@@ -37,8 +38,14 @@ get_playlist_sp.add_argument(
     'id', type=str, help='The id of the playlist you want to download (number in url e.g. /playlists/51023901).')
 get_playlist_sp.set_defaults(func=get_playlist)
 
+# Get all videos from a channel
+get_channel_sp = subparsers.add_parser('channel', help='Get all videos from a Channel.')
+get_channel_sp.add_argument(
+    'id', type=str, help='The id of the channel you want to download (number in url e.g. /channels/51023901).')
+get_channel_sp.set_defaults(func=get_channel)
 
-# Get new videos of all subscribed users
+# Get new videos of all subscribed users, playlists and channels
+# Also continue failed videos
 update_sp = subparsers.add_parser('update', help='Get new videos of all subscribed users/playlists.')
 update_sp.set_defaults(func=update)
 
