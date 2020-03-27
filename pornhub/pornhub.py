@@ -55,7 +55,7 @@ def get_video(args):
 
     folder = args.get('folder')
 
-    clip = Clip.get_or_create(session, viewkey)
+    clip = Clip.get_or_create(session, args['viewkey'])
     if clip.completed:
         if clip.title is not None and \
            clip.extension is not None:
@@ -68,10 +68,11 @@ def get_video(args):
     success, info = download_video(args['viewkey'], name=folder)
 
     clip.title = info['title']
+    clip.tags = info['tags']
+    clip.cartegories = info['categories']
     clip.completed = True
     clip.location = info['out_path']
     clip.extension = info['ext']
-
 
     session.commit()
 

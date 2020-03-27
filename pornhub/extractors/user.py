@@ -37,6 +37,8 @@ def download_user_videos(session, user):
         success, info = download_video(viewkey, user.name)
         if success:
             clip.title = info['title']
+            clip.tags = info['tags']
+            clip.cartegories = info['categories']
             clip.completed = True
             clip.user = user
             clip.location = info['out_path']
@@ -181,11 +183,17 @@ def get_video_upload_viewkeys(user):
     while current_page <= pages:
         print(f'Crawling {next_url}')
         # Users with normal video upload list
-        wrapper = soup.find('div', {'class': 'videoUList'})
-        videos = wrapper.find(id='moreData')
-
-        if videos is None:
-            return []
+        videoSection = soup.find('div', {'class': 'videoUList'})
+        pornstarVideoSection = soup.find(id='pornstarsVideoSection')
+        if videoSection is None:
+            videos = videoSection.find(id='moreData')
+        # Users with pornstarVideoSection
+        elif pornstarVideoSection is not None:
+            videos = pornstarVideoSection
+        else:
+            print(f"Couldn't find video section on {next_url}. Did we log out?")
+            import sys
+            sys.exit(1)
 
         for video in videos.find_all('li'):
             if video.has_attr('_vkey'):

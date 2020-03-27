@@ -28,6 +28,8 @@ def download_playlist_videos(session, playlist):
         success, info = download_video(viewkey, f'playlists/{playlist.name}')
         if success:
             clip.title = info['title']
+            clip.tags = info['tags']
+            clip.cartegories = info['categories']
             clip.completed = True
             clip.location = info['out_path']
             clip.extension = info['ext']

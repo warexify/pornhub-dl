@@ -1,6 +1,7 @@
 """The db model for a Movie."""
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.types import (
     Boolean,
     DateTime,
@@ -22,6 +23,8 @@ class Clip(base):
     location = Column(String)
     completed = Column(Boolean, nullable=False, default=False)
     downloaded = Column(DateTime)
+    tags = Column(JSONB)
+    categories = Column(JSONB)
 
     user = relationship("User")
 
