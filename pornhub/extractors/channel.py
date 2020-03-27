@@ -8,13 +8,17 @@ from bs4 import BeautifulSoup
 
 from pornhub.models import User, Clip
 from pornhub.logging import logger
-from pornhub.helper import get_clip_path, link_duplicate
+from pornhub.helper import get_clip_path, link_duplicate, check_logged_out
 from pornhub.download import get_soup, download_video
 
 
 def download_channel_videos(session, channel):
     """Download all videos of a user."""
     viewkeys = set(get_channel_viewkeys(channel))
+
+    if len(viewkeys) == 0:
+        logger.error(f'Found 0 videos for user {user.key}. Aborting')
+        sys.exit(0)
 
     logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
@@ -62,13 +66,11 @@ def get_channel_info(channel_id):
     else:
         raise Exception("Got invalid response for channel")
 
-    print(soup)
-    sys.exit(1)
     profile = soup.find(id='channelsProfile')
     header = profile.find('div', {'class': 'header'})
     wrapper = profile.find('div', {'class': 'bottomExtendedWrapper'})
     title = profile.find('div', {'class': 'title'})
-    name = title.find('h1')[0].text.strip()
+    name = title.find('h1').text.strip()
 
     name = name.replace(' ', '_')
     name = re.sub(r'[\W]+', '_', name)
@@ -87,9 +89,13 @@ def get_channel_viewkeys(channel):
     soup = get_soup(url)
     if soup is None:
         logger.error(f"Failed to find video page for channel {channel.id}")
+        check_logged_out(soup)
         sys.exit(1)
 
     pages = 1
+    hasNavigation = False
+    hasEndlessScrolling = False
+
     # Some sites have a navigation at the bottom
     navigation = soup.find('div', {'class': 'pagination3'})
     if navigation is not None:
@@ -112,10 +118,11 @@ def get_channel_viewkeys(channel):
 
         logger.info(f'Crawling {next_url}')
         # Users with normal video upload list
-        videos = soup.find('div', {'class': 'showAllChanelVideos'})
+        videos = soup.find(id='showAllChanelVideos')
 
         if videos is None:
             logger.error(f"Couldn't find channel videos in site: {url}")
+            check_logged_out(soup)
             sys.exit(1)
 
         for video in videos.find_all('li'):

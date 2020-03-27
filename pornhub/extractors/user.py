@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from pornhub.models import User, Clip
 from pornhub.logging import logger
-from pornhub.helper import get_clip_path, link_duplicate
+from pornhub.helper import get_clip_path, link_duplicate, check_logged_out
 from pornhub.download import get_soup, download_video
 
 
@@ -20,6 +20,7 @@ def download_user_videos(session, user):
 
     if len(viewkeys) == 0:
         logger.error(f'Found 0 videos for user {user.key}. Aborting')
+        sys.exit(0)
 
     logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
@@ -126,10 +127,10 @@ def get_user_video_viewkeys(user):
         logger.info(f"Nothing on {url}")
         return []
 
+    pages = 1
     hasNavigation = False
     hasEndlessScrolling = False
 
-    pages = 1
     # Some sites have a navigation at the bottom
     navigation = soup.find('div', {'class': 'pagination3'})
     if navigation is not None:
@@ -187,10 +188,10 @@ def get_video_upload_viewkeys(user):
         logger.info(f"Nothing on {url}")
         return []
 
+    pages = 1
     hasNavigation = False
     hasEndlessScrolling = False
 
-    pages = 1
     # Some sites have a navigation at the bottom
     navigation = soup.find('div', {'class': 'pagination3'})
     if navigation is not None:
@@ -222,6 +223,7 @@ def get_video_upload_viewkeys(user):
             videos = pornstarVideoSection
         else:
             logger.error(f"Couldn't find video section on {next_url}. Did we log out?")
+            check_logged_out(soup)
             sys.exit(1)
 
         for video in videos.find_all('li'):

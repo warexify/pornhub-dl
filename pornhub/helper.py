@@ -1,5 +1,7 @@
 import os
 
+from pornhub.logging import logger
+
 
 def get_clip_path(folder, title, extension):
     """Get a path for a clip by folder and title."""
@@ -21,3 +23,9 @@ def link_duplicate(clip, new_path):
         return
 
     os.link(clip.location, new_path)
+
+
+def check_logged_out(soup):
+    """Check if we got logged out."""
+    soup.find('div', {'class': 'enterPremium'})
+    logger.error("Looks like we got logged out.")
