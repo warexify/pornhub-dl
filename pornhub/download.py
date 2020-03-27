@@ -68,7 +68,9 @@ def download_video(viewkey, name='single_videos'):
         'outtmpl': f'~/pornhub/{name}/%(title)s.%(ext)s',
         'format': 'best',
         'quiet': True,
-        'retries': 3
+        'retries': 3,
+        'nooverwrites': False,
+        'continuedl': True,
     }
     if is_premium:
         options['cookiefile'] = 'cookie_file'
