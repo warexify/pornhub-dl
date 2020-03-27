@@ -20,4 +20,4 @@ def symlink_duplicate(clip, new_path):
     if clip.location == new_path:
         return
 
-    os.symlink(clip.location, new_path)
+    os.link(clip.location, new_path)
