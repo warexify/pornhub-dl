@@ -8,6 +8,8 @@ import youtube_dl
 from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
+from pornhub.logging import logger
+
 
 def get_cookies():
     """Get the cookies from the cookie_file"""
@@ -43,7 +45,7 @@ def get_soup(url):
 
             soup = BeautifulSoup(response.text, 'html.parser')
         except BaseException as e:
-            print('Got exception during html fetch.')
+            logger.error('Got exception during html fetch.')
             traceback.print_exc()
             time.sleep(60)
             tries += 1
@@ -79,7 +81,7 @@ def download_video(viewkey, name='single_videos'):
     tries = 0
     while True:
         try:
-            print(f'Start downloading: {video_url}')
+            logger.info(f'Start downloading: {video_url}')
             info = ydl.extract_info(video_url)
             info['out_path'] = f'~/pornhub/{name}/{info["title"]}.{info["ext"]}'
             return True, info
@@ -87,7 +89,7 @@ def download_video(viewkey, name='single_videos'):
             # This is an error that seems to occurr from time to time
             # A short wait and retry often seems to fix the problem
             # This is something about pornhub not properly loading the video.
-            print('Got TypeError bug')
+            logger.info('Got TypeError bug')
             time.sleep(20)
             tries += 1
 
@@ -98,7 +100,7 @@ def download_video(viewkey, name='single_videos'):
         except DownloadError:
             # We got a download error.
             # Ignore for now and continue downloading the other videos
-            print("DownloadError: Failed to download video.")
+            logger.error(f"DownloadError: Failed to download video: {viewkey}.")
             return False, None
 
         time.sleep(6)

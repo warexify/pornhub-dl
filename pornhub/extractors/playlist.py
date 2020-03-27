@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pornhub.models import Clip
+from pornhub.logging import logger
 from pornhub.helper import get_clip_path, link_duplicate
 from pornhub.download import get_soup, download_video
 
@@ -12,7 +13,7 @@ from pornhub.download import get_soup, download_video
 def download_playlist_videos(session, playlist):
     """Download all videos of a playlist."""
     viewkeys = get_playlist_video_viewkeys(playlist)
-    print(f'Found {len(viewkeys)} videos.')
+    logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
         clip = Clip.get_or_create(session, viewkey)
 
@@ -34,7 +35,7 @@ def download_playlist_videos(session, playlist):
             clip.location = info['out_path']
             clip.extension = info['ext']
 
-            print(f'New video: {clip.title}')
+            logger.info(f'New video: {clip.title}')
 
         session.commit()
         time.sleep(20)
@@ -75,8 +76,8 @@ def get_playlist_video_viewkeys(playlist):
     url = get_playlist_video_url(playlist.id)
     soup = get_soup(url)
     if soup is None:
-        print(f"Couldn't find playlist with id {playlist.id}")
-        return []
+        logger.error(f"Couldn't find site for playlist {playlist.id}")
+        sys.exit(1)
 
     videos = soup.find(id='videoPlaylist')
 

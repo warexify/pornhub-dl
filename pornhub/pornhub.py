@@ -4,16 +4,18 @@ import os
 from datetime import datetime
 
 from pornhub.db import get_session
+from pornhub.logging import logger
 from pornhub.helper import link_duplicate
-from pornhub.models import User, Playlist, Clip
+from pornhub.models import User, Playlist, Clip, Channel
 from pornhub.download import download_video
 from pornhub.extractors import (
+    get_channel_info,
     get_user_info,
     get_playlist_info,
+    download_channel_videos,
     download_user_videos,
     download_playlist_videos,
 )
-
 
 
 def get_user(args):
@@ -49,6 +51,21 @@ def get_playlist(args):
     session.commit()
 
 
+def get_channel(args):
+    """Get all information about the channel and download it's videos."""
+    channel_id = args['id']
+    session = get_session()
+
+    channel = session.query(Channel).get(channel_id)
+    if channel is None:
+        info = get_channel_info(channel_id)
+        channel = Channel.get_or_create(session, channel_id, info['name'])
+
+    download_channel_videos(session, channel)
+    channel.last_scan = datetime.now()
+    session.commit()
+
+
 def get_video(args):
     """Get a single videos."""
     session = get_session()
@@ -62,7 +79,7 @@ def get_video(args):
             target_path = get_clip_path(folder, clip.title, clip.extension)
             link_duplicate(clip, target_path)
 
-        print("Clip already exists")
+        logger.info("Clip already exists")
         return
 
     success, info = download_video(args['viewkey'], name=folder)
@@ -80,18 +97,25 @@ def get_video(args):
 def update(args):
     """Get all information about a user and download their videos."""
     session = get_session()
-    users = session.query(User).order_by(User.key).all()
 
+    users = session.query(User).order_by(User.key).all()
     for user in users:
-        print(f'\nStart downloading user: {user.name}')
+        logger.info(f'\nStart downloading user: {user.name}')
         download_user_videos(session, user)
         user.last_scan = datetime.now()
         session.commit()
 
     playlists = session.query(Playlist).order_by(Playlist.name).all()
     for playlist in playlists:
-        print(f'\nStart downloading playlist: {playlist.name}')
+        logger.info(f'\nStart downloading playlist: {playlist.name}')
         download_playlist_videos(session, playlist)
+        user.last_scan = datetime.now()
+        session.commit()
+
+    channels = session.query(Channel).order_by(Channel.name).all()
+    for channel in channels:
+        logger.info(f'\nStart downloading channel: {channel.name}')
+        download_channel_videos(session, channel)
         user.last_scan = datetime.now()
         session.commit()
 

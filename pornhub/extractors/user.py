@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pornhub.models import User, Clip
+from pornhub.logging import logger
 from pornhub.helper import get_clip_path, link_duplicate
 from pornhub.download import get_soup, download_video
 
@@ -17,7 +18,10 @@ def download_user_videos(session, user):
     video_upload_viewkeys = get_video_upload_viewkeys(user)
     viewkeys = set(video_viewkeys + video_upload_viewkeys)
 
-    print(f'Found {len(viewkeys)} videos.')
+    if len(viewkeys) == 0:
+        logger.error(f'Found 0 videos for user {user.key}. Aborting')
+
+    logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
         clip = Clip.get_or_create(session, viewkey, user)
 
@@ -44,7 +48,7 @@ def download_user_videos(session, user):
             clip.location = info['out_path']
             clip.extension = info['ext']
 
-            print(f'New video: {clip.title}')
+            logger.info(f'New video: {clip.title}')
 
         session.commit()
         time.sleep(20)
@@ -119,7 +123,7 @@ def get_user_video_viewkeys(user):
 
     soup = get_soup(url)
     if soup is None:
-        print(f"Nothing on {url}")
+        logger.info(f"Nothing on {url}")
         return []
 
     hasNavigation = False
@@ -146,7 +150,7 @@ def get_user_video_viewkeys(user):
         if hasEndlessScrolling and soup.find(id='moreDataBtnStream'):
             pages += 1
 
-        print(f'Crawling {next_url}')
+        logger.info(f'Crawling {next_url}')
         # Users with normal video upload list
         videos = soup.find('div', {'class': 'mostRecentVideosSection'})
 
@@ -180,7 +184,7 @@ def get_video_upload_viewkeys(user):
 
     soup = get_soup(url)
     if soup is None:
-        print(f"Nothing on {url}")
+        logger.info(f"Nothing on {url}")
         return []
 
     hasNavigation = False
@@ -207,7 +211,7 @@ def get_video_upload_viewkeys(user):
         if hasEndlessScrolling and soup.find(id='moreDataBtnStream'):
             pages += 1
 
-        print(f'Crawling {next_url}')
+        logger.info(f'Crawling {next_url}')
         # Users with normal video upload list
         videoSection = soup.find('div', {'class': 'videoUList'})
         pornstarVideoSection = soup.find(id='pornstarsVideoSection')
@@ -217,8 +221,7 @@ def get_video_upload_viewkeys(user):
         elif pornstarVideoSection is not None:
             videos = pornstarVideoSection
         else:
-            print(f"Couldn't find video section on {next_url}. Did we log out?")
-            import sys
+            logger.error(f"Couldn't find video section on {next_url}. Did we log out?")
             sys.exit(1)
 
         for video in videos.find_all('li'):
