@@ -22,7 +22,10 @@ def link_duplicate(clip, new_path):
     if clip.location == new_path:
         return
 
-    os.link(clip.location, new_path)
+    if os.path.exists(clip.location):
+        os.link(clip.location, new_path)
+    else:
+        clip.location = new_path
 
 
 def check_logged_out(soup):
