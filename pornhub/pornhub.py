@@ -139,3 +139,27 @@ def reset(args):
     session.commit()
 
     print("All videos have been scheduled for new download. Please run `update` to start downloading.")
+
+
+def remove(args):
+    """Get all information about a user and download their videos."""
+    entity_type = args['type']
+    key = args['key']
+
+    session = get_session()
+    if entity_type.lower() == 'user':
+        user = session.query(User).get(key)
+        session.delete(user)
+    elif entity_type.lower() == 'playlist':
+        playlist = session.query(Playlist).get(key)
+        session.delete(playlist)
+    elif entity_type.lower() == 'channel':
+        channel = session.query(Channel).get(key)
+        session.delete(channel)
+    else:
+        print(f"Unkown type {entity_type}. Use either `user`, `playlist` or `channel`")
+
+
+
+    session.commit()
+    print(f"{entity_type} {key} has been removed")

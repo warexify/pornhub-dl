@@ -5,6 +5,7 @@ from pornhub.pornhub import (
     get_playlist,
     get_user,
     get_video,
+    remove,
     reset,
     update,
 )
@@ -52,3 +53,9 @@ update_sp.set_defaults(func=update)
 # Reset all videos and download them again
 reset_sp = subparsers.add_parser('reset', help='Schedule all videos to be downloaded again.')
 reset_sp.set_defaults(func=reset)
+
+# Reset all videos and download them again
+remove_sp = subparsers.add_parser('remove', help='Remove a user, playlist or channel')
+remove_sp.add_argument('type', type=str, help='Should be either `user`, `playlist` or `channel`')
+remove_sp.add_argument('key', type=str, help='The identifier that has been used to add the user')
+remove_sp.set_defaults(func=remove)
