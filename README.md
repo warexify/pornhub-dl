@@ -24,7 +24,7 @@ There is a help for all commands, but here are some examples anyway:
 
 `pornhub_dl.py user [some_model]` Follow this user/model/pornstar and download all videos.  
 `pornhub_dl.py playlist [playlist_id]` Follow this user/model/pornstar and download all videos.  
-`pornhub_dl.py video [vkey]` Download a single video by viewkey e.g. `1598008994`.  
+`pornhub_dl.py video [vkey]` Download a single video by viewkey e.g. `ph56e961d32ce26`.  
 `pornhub_dl.py update` Get the newest videos of all your followed models and channels.  
 
 
