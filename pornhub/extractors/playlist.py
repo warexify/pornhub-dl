@@ -53,13 +53,17 @@ def get_playlist_video_url(playlist_id):
 def get_playlist_info(playlist_id):
     """Get meta information from playlist website."""
     url = get_playlist_video_url(playlist_id)
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-    else:
-        raise Exception("Got invalid response for playlist")
+    soup = get_soup(url)
+    if soup is None:
+        logger.error("Got invalid response for playlist: {url}")
+        sys.exit(1)
 
     header = soup.find(id='playlistTopHeader')
+    if header is None:
+        logger.info(f"Couldn't get info for playlist: {url}")
+        check_logged_out(soup)
+        sys.exit(1)
+
     link = header.find_all('a')[0]
 
     name = link.text.strip()

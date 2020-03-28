@@ -28,7 +28,7 @@ def get_cookies():
     return cookies_jar
 
 
-def get_soup(url):
+def get_soup(url, allow_redirects=True):
     """Get new soup instance from url."""
     tries = 0
     while True:
@@ -37,7 +37,7 @@ def get_soup(url):
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0",
             }
             cookies = get_cookies()
-            response = requests.get(url, headers=headers, cookies=cookies)
+            response = requests.get(url, headers=headers, cookies=cookies, allow_redirects=allow_redirects)
 
             # Couldn't find the site. Stop and return None
             if response.status_code != 200:

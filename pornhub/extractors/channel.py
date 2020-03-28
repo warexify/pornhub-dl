@@ -60,15 +60,14 @@ def get_channel_video_url(channel_id):
 def get_channel_info(channel_id):
     """Get meta information from channel website."""
     url = get_channel_video_url(channel_id)
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-    else:
-        raise Exception("Got invalid response for channel")
+    soup = get_soup(url)
+    if soup is None:
+        logger.error("Got invalid response for channel: {url}")
+        sys.exit(1)
 
     profile = soup.find(id='channelsProfile')
     if profile is None:
-        logger.info("Couldn't get info for channel")
+        logger.info(f"Couldn't get info for channel: {url}")
         check_logged_out(soup)
         sys.exit(1)
 

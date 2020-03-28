@@ -78,9 +78,9 @@ def get_user_type_and_url(key):
         possible_urls[user_type] = get_user_video_url(user_type, key)
 
     for user_type, url in possible_urls.items():
-        response = requests.get(url, allow_redirects=False)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
+        soup = get_soup(url, False)
+
+        if soup is not None:
             return user_type, url, soup
 
     raise Exception(f"Couldn't detect type for user {key}")
