@@ -216,11 +216,15 @@ def get_video_upload_viewkeys(user):
         # Users with normal video upload list
         videoSection = soup.find('div', {'class': 'videoUList'})
         pornstarVideoSection = soup.find(id='pornstarsVideoSection')
+        claimedUploadedVideoSection = soup.find(id='claimedUploadedVideoSection')
         if videoSection is not None:
             videos = videoSection.find(id='moreData')
         # Users with pornstarVideoSection
         elif pornstarVideoSection is not None:
             videos = pornstarVideoSection
+
+        elif claimedUploadedVideoSection is not None:
+            videos = claimedUploadedVideoSection
         else:
             logger.error(f"Couldn't find video section on {next_url}. Did we log out?")
             check_logged_out(soup)

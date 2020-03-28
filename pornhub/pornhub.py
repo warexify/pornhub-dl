@@ -24,9 +24,11 @@ def get_user(args):
     session = get_session()
 
     user = session.query(User).get(key)
+    info = get_user_info(key)
     if user is None:
-        info = get_user_info(key)
         user = User.get_or_create(session, key, info['name'], info['type'])
+    else:
+        user.user_type = info['type']
 
     user.subscribed = True
     session.commit()
@@ -100,6 +102,10 @@ def update(args):
 
     users = session.query(User).order_by(User.key).all()
     for user in users:
+        # Re query the user type, since this can change over time
+        info = get_user_info(user.key)
+        user.user_type = info['type']
+
         logger.info(f'\nStart downloading user: {user.name}')
         download_user_videos(session, user)
         user.last_scan = datetime.now()
