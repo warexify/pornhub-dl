@@ -13,6 +13,9 @@ from pornhub.download import get_soup, download_video
 def download_playlist_videos(session, playlist):
     """Download all videos of a playlist."""
     viewkeys = get_playlist_video_viewkeys(playlist)
+
+    full_success = True
+
     logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
         clip = Clip.get_or_create(session, viewkey)
@@ -36,10 +39,13 @@ def download_playlist_videos(session, playlist):
             clip.extension = info['ext']
 
             logger.info(f'New video: {clip.title}')
+        else:
+            full_success = False
 
         session.commit()
         time.sleep(20)
 
+    return full_success
 
 def get_playlist_video_url(playlist_id):
     """Compile the user videos url."""

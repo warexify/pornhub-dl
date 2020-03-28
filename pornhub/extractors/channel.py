@@ -20,9 +20,11 @@ def download_channel_videos(session, channel):
         logger.error(f'Found 0 videos for user {user.key}. Aborting')
         sys.exit(0)
 
+    full_success = True
+
     logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
-        clip = Clip.get_or_create(session, viewkey, user)
+        clip = Clip.get_or_create(session, viewkey)
 
         # The clip has already been downloaded, skip it.
         if clip.completed:
@@ -43,13 +45,17 @@ def download_channel_videos(session, channel):
             clip.extension = info['ext']
 
             logger.info(f'New video: {clip.title}')
+        else:
+            full_success = False
 
         session.commit()
         time.sleep(20)
 
+    return full_success
+
 
 def get_channel_video_url(channel_id):
-    """Compile the user videos url."""
+    """Compile the channel videos url."""
     is_premium = os.path.exists('http_cookie_file')
     if is_premium:
         return f'https://www.pornhubpremium.com/channels/{channel_id}'
@@ -83,7 +89,7 @@ def get_channel_info(channel_id):
 
 
 def get_channel_viewkeys(channel):
-    """Scrape all public viewkeys of the user's videos."""
+    """Scrape all public viewkeys of the channel's videos."""
     is_premium = os.path.exists('http_cookie_file')
     if is_premium:
         url = f'https://www.pornhubpremium.com/channels/{channel.id}/videos'
@@ -121,7 +127,7 @@ def get_channel_viewkeys(channel):
             pages += 1
 
         logger.info(f'Crawling {next_url}')
-        # Users with normal video upload list
+        # Channel with normal video upload list
         videos = soup.find(id='showAllChanelVideos')
 
         if videos is None:

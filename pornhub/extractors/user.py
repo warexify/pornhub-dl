@@ -15,12 +15,20 @@ from pornhub.download import get_soup, download_video
 def download_user_videos(session, user):
     """Download all videos of a user."""
     video_viewkeys = get_user_video_viewkeys(user)
+
+    # Try to get all uploaded videos
     video_upload_viewkeys = get_video_upload_viewkeys(user)
+    # If that doesn't work, try to get all public uploaded videos
+    if len(video_upload_viewkeys) == 0:
+        video_upload_viewkeys = get_video_upload_viewkeys(user, True)
+
     viewkeys = set(video_viewkeys + video_upload_viewkeys)
 
     if len(viewkeys) == 0:
         logger.error(f'Found 0 videos for user {user.key}. Aborting')
         sys.exit(0)
+
+    full_success = True
 
     logger.info(f'Found {len(viewkeys)} videos.')
     for viewkey in viewkeys:
@@ -50,15 +58,22 @@ def download_user_videos(session, user):
             clip.extension = info['ext']
 
             logger.info(f'New video: {clip.title}')
+        else:
+            full_success = False
 
         session.commit()
         time.sleep(20)
+
+    return full_success
 
 
 def get_user_info(key):
     """Get all necessary user information."""
     user_type, url, soup = get_user_type_and_url(key)
     name = get_user_name_from_soup(soup, 'user')
+    if name is None:
+        logger.error(f"Couldn't get user info for {key}")
+        sys.exit(1)
 
     name = name.strip()
     name = name.replace(' ', '_')
@@ -89,6 +104,11 @@ def get_user_type_and_url(key):
 def get_user_name_from_soup(soup, website_type):
     """Get the name of the user by website."""
     profileHeader = soup.find('section', {'class': 'topProfileHeader'})
+    if profileHeader is None:
+        profileHeader = soup.find(id='topProfileHeader')
+
+    if profileHeader is None:
+        return None
 
     # Try to get the user name from subscription element
     div = profileHeader.find('div', {'class': 'nameSubscribe'})
@@ -175,13 +195,19 @@ def get_user_video_viewkeys(user):
     return keys
 
 
-def get_video_upload_viewkeys(user):
+def get_video_upload_viewkeys(user, public=False):
     """Scrape viewkeys from the user's user/videos/upload route."""
     is_premium = os.path.exists('http_cookie_file')
     if is_premium:
         url = f'https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/upload'
     else:
         url = f'https://www.pornhub.com/{user.user_type}/{user.key}/videos/upload'
+
+    if public:
+        if is_premium:
+            url = f'https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/public'
+        else:
+            url = f'https://www.pornhub.com/{user.user_type}/{user.key}/videos/public'
 
     soup = get_soup(url)
     if soup is None:
@@ -213,16 +239,17 @@ def get_video_upload_viewkeys(user):
             pages += 1
 
         logger.info(f'Crawling {next_url}')
-        # Users with normal video upload list
         videoSection = soup.find('div', {'class': 'videoUList'})
         pornstarVideoSection = soup.find(id='pornstarsVideoSection')
         claimedUploadedVideoSection = soup.find(id='claimedUploadedVideoSection')
+
+        # Users with normal video upload list
         if videoSection is not None:
             videos = videoSection.find(id='moreData')
         # Users with pornstarVideoSection
         elif pornstarVideoSection is not None:
             videos = pornstarVideoSection
-
+        # Dunno what this is
         elif claimedUploadedVideoSection is not None:
             videos = claimedUploadedVideoSection
         else:

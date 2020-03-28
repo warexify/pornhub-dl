@@ -1,7 +1,7 @@
 #!/bin/env python3
 """A scraper for pornhub."""
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pornhub.db import get_session
 from pornhub.logging import logger
@@ -33,8 +33,9 @@ def get_user(args):
     user.subscribed = True
     session.commit()
 
-    download_user_videos(session, user)
-    session.last_scan = datetime.now()
+    # Only set the last scan date, if everything could be downloaded
+    if download_user_videos(session, user):
+        session.last_scan = datetime.now()
     session.commit()
 
 
@@ -48,8 +49,9 @@ def get_playlist(args):
         info = get_playlist_info(playlist_id)
         playlist = Playlist.get_or_create(session, playlist_id, info['name'])
 
-    download_playlist_videos(session, playlist)
-    playlist.last_scan = datetime.now()
+    # Only set the last scan date, if everything could be downloaded
+    if download_playlist_videos(session, playlist):
+        playlist.last_scan = datetime.now()
     session.commit()
 
 
@@ -63,8 +65,9 @@ def get_channel(args):
         info = get_channel_info(channel_id)
         channel = Channel.get_or_create(session, channel_id, info['name'])
 
-    download_channel_videos(session, channel)
-    channel.last_scan = datetime.now()
+    # Only set the last scan date, if everything could be downloaded
+    if download_channel_videos(session, channel):
+        channel.last_scan = datetime.now()
     session.commit()
 
 
@@ -102,6 +105,7 @@ def update(args):
 
     threshold = datetime.now() - timedelta(hours=8)
 
+    # Go through all users
     users = (
         session.query(User)
         .filter(User.last_scan <= threshold)
@@ -110,14 +114,16 @@ def update(args):
     )
     for user in users:
         # Re query the user type, since this can change over time
+        print(user.key)
         info = get_user_info(user.key)
         user.user_type = info['type']
 
         logger.info(f'\nStart downloading user: {user.name}')
-        download_user_videos(session, user)
-        user.last_scan = datetime.now()
+        if download_user_videos(session, user):
+            user.last_scan = datetime.now()
         session.commit()
 
+    # Go through all playlists
     playlists = (
         session.query(Playlist)
         .filter(Playlist.last_scan <= threshold)
@@ -126,10 +132,11 @@ def update(args):
     )
     for playlist in playlists:
         logger.info(f'\nStart downloading playlist: {playlist.name}')
-        download_playlist_videos(session, playlist)
-        user.last_scan = datetime.now()
+        if download_playlist_videos(session, playlist):
+            user.last_scan = datetime.now()
         session.commit()
 
+    # Go through all channels
     channels = (
         session.query(Channel)
         .filter(Channel.last_scan <= threshold)
@@ -138,8 +145,8 @@ def update(args):
     )
     for channel in channels:
         logger.info(f'\nStart downloading channel: {channel.name}')
-        download_channel_videos(session, channel)
-        user.last_scan = datetime.now()
+        if download_channel_videos(session, channel):
+            user.last_scan = datetime.now()
         session.commit()
 
     clips = (
