@@ -9,6 +9,12 @@ from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
 
 from pornhub.logging import logger
+from pornhub.config import config
+
+
+def get_user_download_dir(name):
+    """Get the download key for a user."""
+    return os.path.join(config['location'], name)
 
 
 def get_cookies():

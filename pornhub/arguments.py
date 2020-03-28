@@ -5,6 +5,7 @@ from pornhub.pornhub import (
     get_playlist,
     get_user,
     get_video,
+    rename,
     remove,
     reset,
     update,
@@ -49,6 +50,12 @@ get_channel_sp.set_defaults(func=get_channel)
 # Also continue failed videos
 update_sp = subparsers.add_parser('update', help='Get new videos of all subscribed users/playlists.')
 update_sp.set_defaults(func=update)
+
+# Reset all videos and download them again
+rename_sp = subparsers.add_parser('rename', help='Rename a user. (They can change their keys)')
+rename_sp.add_argument('old_key', type=str, help='The old identifier')
+rename_sp.add_argument('new_key', type=str, help='The new identifier')
+rename_sp.set_defaults(func=rename)
 
 # Reset all videos and download them again
 reset_sp = subparsers.add_parser('reset', help='Schedule all videos to be downloaded again.')

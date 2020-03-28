@@ -7,7 +7,7 @@ from pornhub.db import get_session
 from pornhub.logging import logger
 from pornhub.helper import link_duplicate
 from pornhub.models import User, Playlist, Clip, Channel
-from pornhub.download import download_video
+from pornhub.download import download_video, get_user_download_dir
 from pornhub.extractors import (
     get_channel_info,
     get_user_info,
@@ -138,8 +138,41 @@ def update(args):
         session.commit()
 
 
+def rename(args):
+    """Rename a user."""
+    old_key = args['old_key']
+    new_key = args['new_key']
+
+    session = get_session()
+    user = session.query(User).get(old_key)
+    if user is None:
+        print(f"Couldn't find user with {old_key}")
+        return
+
+    new_user = session.query(User).get(new_key)
+    if new_user is not None:
+        print(f"New user {new_key} already exists")
+        return
+
+    # Get new user info
+    info = get_user_info(new_key)
+
+    # Get new user info
+    old_dir = get_user_download_dir(user.name)
+    new_dir = get_user_download_dir(info['name'])
+
+    if os.path.exists(old_dir):
+        os.rename(old_dir, new_dir)
+
+    user.key = new_key
+    user.name = info['name']
+
+    session.commit()
+    print(f"user {old_key} has been renamed to {new_key}")
+
+
 def reset(args):
-    """Get all information about a user and download their videos."""
+    """Reset all videos and schedule for download."""
     session = get_session()
     session.query(Clip).update({"completed": False})
     session.commit()
@@ -148,24 +181,26 @@ def reset(args):
 
 
 def remove(args):
-    """Get all information about a user and download their videos."""
+    """Remove all information about a user/channel/playlist."""
     entity_type = args['type']
     key = args['key']
 
     session = get_session()
     if entity_type.lower() == 'user':
-        user = session.query(User).get(key)
-        session.delete(user)
+        entity = session.query(User).get(key)
     elif entity_type.lower() == 'playlist':
-        playlist = session.query(Playlist).get(key)
-        session.delete(playlist)
+        entity = session.query(Playlist).get(key)
     elif entity_type.lower() == 'channel':
-        channel = session.query(Channel).get(key)
-        session.delete(channel)
+        entity = session.query(Channel).get(key)
     else:
         print(f"Unkown type {entity_type}. Use either `user`, `playlist` or `channel`")
+        return
+
+    if entity is None:
+        print(f"Couldn't finde {entity_type} {key}")
+        return
 
 
-
+    session.delete(entity)
     session.commit()
     print(f"{entity_type} {key} has been removed")

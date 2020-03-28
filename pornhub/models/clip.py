@@ -17,7 +17,7 @@ class Clip(base):
     __tablename__ = 'movie'
 
     viewkey = Column(String, primary_key=True)
-    user_key = Column(String, ForeignKey('user.key', ondelete='cascade', name='user'), index=True)
+    user_key = Column(String, ForeignKey('user.key', ondelete='cascade', onupdate='cascade', name='user'), index=True)
     title = Column(String)
     extension = Column(String)
     location = Column(String)
