@@ -100,7 +100,14 @@ def update(args):
     """Get all information about a user and download their videos."""
     session = get_session()
 
-    users = session.query(User).order_by(User.key).all()
+    threshold = datetime.now() - timedelta(hours=8)
+
+    users = (
+        session.query(User)
+        .filter(User.last_scan <= threshold)
+        .order_by(User.key)
+        .all()
+    )
     for user in users:
         # Re query the user type, since this can change over time
         info = get_user_info(user.key)
@@ -111,14 +118,24 @@ def update(args):
         user.last_scan = datetime.now()
         session.commit()
 
-    playlists = session.query(Playlist).order_by(Playlist.name).all()
+    playlists = (
+        session.query(Playlist)
+        .filter(Playlist.last_scan <= threshold)
+        .order_by(Playlist.name)
+        .all()
+    )
     for playlist in playlists:
         logger.info(f'\nStart downloading playlist: {playlist.name}')
         download_playlist_videos(session, playlist)
         user.last_scan = datetime.now()
         session.commit()
 
-    channels = session.query(Channel).order_by(Channel.name).all()
+    channels = (
+        session.query(Channel)
+        .filter(Channel.last_scan <= threshold)
+        .order_by(Channel.name)
+        .all()
+    )
     for channel in channels:
         logger.info(f'\nStart downloading channel: {channel.name}')
         download_channel_videos(session, channel)
