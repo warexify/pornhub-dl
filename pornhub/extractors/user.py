@@ -26,7 +26,7 @@ def download_user_videos(session, user):
 
     if len(viewkeys) == 0:
         logger.error(f'Found 0 videos for user {user.key}. Aborting')
-        sys.exit(0)
+        sys.exit(1)
 
     full_success = True
 
