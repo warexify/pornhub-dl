@@ -30,5 +30,6 @@ def link_duplicate(clip, new_path):
 
 def check_logged_out(soup):
     """Check if we got logged out."""
-    soup.find('div', {'class': 'enterPremium'})
-    logger.error("Looks like we got logged out.")
+    enterPremium = soup.find('div', {'class': 'enterPremium'})
+    if enterPremium:
+        logger.error("Looks like we got logged out.")

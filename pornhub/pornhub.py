@@ -3,6 +3,7 @@
 import os
 from datetime import datetime, timedelta
 
+from pornhub.config import config
 from pornhub.db import get_session
 from pornhub.logging import logger
 from pornhub.helper import link_duplicate

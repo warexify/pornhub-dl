@@ -254,8 +254,9 @@ def get_video_upload_viewkeys(user, public=False):
             videos = claimedUploadedVideoSection
         else:
             logger.error(f"Couldn't find video section on {next_url}. Did we log out?")
-            check_logged_out(soup)
-            sys.exit(1)
+            if check_logged_out(soup):
+                sys.exit(1)
+            return []
 
         for video in videos.find_all('li'):
             if video.has_attr('_vkey'):
