@@ -3,19 +3,18 @@
 Download all videos of your favorite pornhub models, playlists and channels and update all your stuff with a simple command.
 
 ## Setup
-1. You will need `poetry` for dependency management and venv creation: `poetry install --develop .`
+1. You will need `poetry` for dependency management and venv creation: `poetry install`
 2. The default config will create a new postgres database `pornhub` when first running the program.
 Make sure your user has proper rights.
 If you want to change this, you need to adjust the sqluri in `db.py`.
 
 3. If you want to be up to date with migrations, set the alembic head to your current version.
-You can use this by utilizing `potry run alembic history` and `poetry run alembic stamp $stamp`
+You can use this by running `poetry run alembic stamp head`.
 
 
 ## Migrating
 
 Just execute `poetry run alembic upgrade head`.
-If you use another database engine/nam, you need to adjust the sqluri in alembic.ini as well.
 
 ## Usage
 The project is used by invocing `pornhub-dl`. In combination with poetry this looks like this: `poetry run python pornhub-dl`  
@@ -27,9 +26,9 @@ There is a help for all commands, but here are some examples anyway:
 `pornhub-dl channel [channel_id]` Follow this channel and download all videos.  
 `pornhub-dl video [vkey]` Download a single video by viewkey e.g. `ph56e961d32ce26`  
 `pornhub-dl update` Get the newest videos of all your followed models, playlists and channels.  
-`pornhub-dl reset` Reschedule all files for download. Useful if you got your hands on a premium account ;) 
-`pornhub-dl remove` Remove a user, if it no longer exists
-`pornhub-dl rename` Rename a user, if they chainged their user key
+`pornhub-dl reset` Reschedule all files for download. Useful if you got your hands on a premium account ;)   
+`pornhub-dl remove` Remove a user, if it no longer exists  
+`pornhub-dl rename` Rename a user, if they chainged their user key  
 
 
 ## How does it work?
