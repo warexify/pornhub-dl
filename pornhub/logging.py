@@ -5,7 +5,7 @@ import time
 import logging
 
 # Logger init and logger format
-sys_logger = logging.getLogger('')
+sys_logger = logging.getLogger("")
 sys_logger.setLevel(logging.INFO)
 format_str = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
@@ -15,7 +15,7 @@ channel_handler.setFormatter(format_str)
 sys_logger.addHandler(channel_handler)
 
 
-class Logger():
+class Logger:
     """Custom logger to always get instant flushes."""
 
     def info(self, message):
@@ -29,5 +29,6 @@ class Logger():
     def debug(self, message):
         sys_logger.debug(message)
         channel_handler.flush()
+
 
 logger = Logger()

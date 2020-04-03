@@ -21,15 +21,15 @@ from pornhub.extractors import (
 
 def get_user(args):
     """Get all information about a user and download their videos."""
-    key = args['key']
+    key = args["key"]
     session = get_session()
 
     user = session.query(User).get(key)
     info = get_user_info(key)
     if user is None:
-        user = User.get_or_create(session, key, info['name'], info['type'])
+        user = User.get_or_create(session, key, info["name"], info["type"])
     else:
-        user.user_type = info['type']
+        user.user_type = info["type"]
 
     user.subscribed = True
     session.commit()
@@ -42,13 +42,13 @@ def get_user(args):
 
 def get_playlist(args):
     """Get all information about the playlist and download it's videos."""
-    playlist_id = args['id']
+    playlist_id = args["id"]
     session = get_session()
 
     playlist = session.query(Playlist).get(playlist_id)
     if playlist is None:
         info = get_playlist_info(playlist_id)
-        playlist = Playlist.get_or_create(session, playlist_id, info['name'])
+        playlist = Playlist.get_or_create(session, playlist_id, info["name"])
 
     # Only set the last scan date, if everything could be downloaded
     if download_playlist_videos(session, playlist):
@@ -58,13 +58,13 @@ def get_playlist(args):
 
 def get_channel(args):
     """Get all information about the channel and download it's videos."""
-    channel_id = args['id']
+    channel_id = args["id"]
     session = get_session()
 
     channel = session.query(Channel).get(channel_id)
     if channel is None:
         info = get_channel_info(channel_id)
-        channel = Channel.get_or_create(session, channel_id, info['name'])
+        channel = Channel.get_or_create(session, channel_id, info["name"])
 
     # Only set the last scan date, if everything could be downloaded
     if download_channel_videos(session, channel):
@@ -76,26 +76,25 @@ def get_video(args):
     """Get a single videos."""
     session = get_session()
 
-    folder = args.get('folder')
+    folder = args.get("folder")
 
-    clip = Clip.get_or_create(session, args['viewkey'])
+    clip = Clip.get_or_create(session, args["viewkey"])
     if clip.completed:
-        if clip.title is not None and \
-           clip.extension is not None:
+        if clip.title is not None and clip.extension is not None:
             target_path = get_clip_path(folder, clip.title, clip.extension)
             link_duplicate(clip, target_path)
 
         logger.info("Clip already exists")
         return
 
-    success, info = download_video(args['viewkey'], name=folder)
+    success, info = download_video(args["viewkey"], name=folder)
 
-    clip.title = info['title']
-    clip.tags = info['tags']
-    clip.cartegories = info['categories']
+    clip.title = info["title"]
+    clip.tags = info["tags"]
+    clip.cartegories = info["categories"]
     clip.completed = True
-    clip.location = info['out_path']
-    clip.extension = info['ext']
+    clip.location = info["out_path"]
+    clip.extension = info["ext"]
 
     session.commit()
 
@@ -108,18 +107,15 @@ def update(args):
 
     # Go through all users
     users = (
-        session.query(User)
-        .filter(User.last_scan <= threshold)
-        .order_by(User.key)
-        .all()
+        session.query(User).filter(User.last_scan <= threshold).order_by(User.key).all()
     )
     for user in users:
         # Re query the user type, since this can change over time
         print(user.key)
         info = get_user_info(user.key)
-        user.user_type = info['type']
+        user.user_type = info["type"]
 
-        logger.info(f'\nStart downloading user: {user.name}')
+        logger.info(f"\nStart downloading user: {user.name}")
         if download_user_videos(session, user):
             user.last_scan = datetime.now()
         session.commit()
@@ -132,7 +128,7 @@ def update(args):
         .all()
     )
     for playlist in playlists:
-        logger.info(f'\nStart downloading playlist: {playlist.name}')
+        logger.info(f"\nStart downloading playlist: {playlist.name}")
         if download_playlist_videos(session, playlist):
             user.last_scan = datetime.now()
         session.commit()
@@ -145,16 +141,16 @@ def update(args):
         .all()
     )
     for channel in channels:
-        logger.info(f'\nStart downloading channel: {channel.name}')
+        logger.info(f"\nStart downloading channel: {channel.name}")
         if download_channel_videos(session, channel):
             user.last_scan = datetime.now()
         session.commit()
 
     clips = (
         session.query(Clip)
-            .filter(Clip.completed.is_(False))
-            .filter(Clip.location.isnot(None))
-            .all()
+        .filter(Clip.completed.is_(False))
+        .filter(Clip.location.isnot(None))
+        .all()
     )
 
     for clip in clips:
@@ -165,8 +161,8 @@ def update(args):
 
 def rename(args):
     """Rename a user."""
-    old_key = args['old_key']
-    new_key = args['new_key']
+    old_key = args["old_key"]
+    new_key = args["new_key"]
 
     session = get_session()
     user = session.query(User).get(old_key)
@@ -184,13 +180,13 @@ def rename(args):
 
     # Get new user info
     old_dir = get_user_download_dir(user.name)
-    new_dir = get_user_download_dir(info['name'])
+    new_dir = get_user_download_dir(info["name"])
 
     if os.path.exists(old_dir):
         os.rename(old_dir, new_dir)
 
     user.key = new_key
-    user.name = info['name']
+    user.name = info["name"]
 
     session.commit()
     print(f"user {old_key} has been renamed to {new_key}")
@@ -202,20 +198,22 @@ def reset(args):
     session.query(Clip).update({"completed": False})
     session.commit()
 
-    print("All videos have been scheduled for new download. Please run `update` to start downloading.")
+    print(
+        "All videos have been scheduled for new download. Please run `update` to start downloading."
+    )
 
 
 def remove(args):
     """Remove all information about a user/channel/playlist."""
-    entity_type = args['type']
-    key = args['key']
+    entity_type = args["type"]
+    key = args["key"]
 
     session = get_session()
-    if entity_type.lower() == 'user':
+    if entity_type.lower() == "user":
         entity = session.query(User).get(key)
-    elif entity_type.lower() == 'playlist':
+    elif entity_type.lower() == "playlist":
         entity = session.query(Playlist).get(key)
-    elif entity_type.lower() == 'channel':
+    elif entity_type.lower() == "channel":
         entity = session.query(Channel).get(key)
     else:
         print(f"Unkown type {entity_type}. Use either `user`, `playlist` or `channel`")
@@ -224,7 +222,6 @@ def remove(args):
     if entity is None:
         print(f"Couldn't finde {entity_type} {key}")
         return
-
 
     session.delete(entity)
     session.commit()

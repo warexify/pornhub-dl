@@ -13,11 +13,11 @@ from pornhub.db import base
 class User(base):
     """The model for a user."""
 
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
-    USER = 'users'
-    MODEL = 'model'
-    PORNSTAR = 'pornstar'
+    USER = "users"
+    MODEL = "model"
+    PORNSTAR = "pornstar"
 
     key = Column(String, primary_key=True)
     name = Column(String, unique=True)
@@ -27,7 +27,7 @@ class User(base):
     last_scan = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    clips = relationship('Clip')
+    clips = relationship("Clip")
 
     def __init__(self, key, name, user_type):
         """Create a new user."""

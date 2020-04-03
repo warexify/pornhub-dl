@@ -13,11 +13,11 @@ def main():
 
     try:
         var_args = vars(args)
-        if 'func' in var_args:
+        if "func" in var_args:
             args.func(var_args)
         else:
             print("Unknown command. Use --help.")
             sys.exit(1)
     except KeyboardInterrupt:
-        print('Keyboard interrupt. Shutting down')
+        print("Keyboard interrupt. Shutting down")
         sys.exit(0)

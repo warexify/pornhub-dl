@@ -5,11 +5,11 @@ import toml
 import logging
 
 default_config = {
-    "sql_uri": 'postgres://localhost/pornhub',
-    "location": os.path.expanduser('~/pornhub'),
+    "sql_uri": "postgres://localhost/pornhub",
+    "location": os.path.expanduser("~/pornhub"),
 }
 
-config_path = os.path.expanduser('~/.config/pornhub_dl.toml')
+config_path = os.path.expanduser("~/.config/pornhub_dl.toml")
 
 if not os.path.exists(config_path):
     with open(config_path, "w") as file_descriptor:

@@ -11,7 +11,7 @@ from pornhub.db import base
 class Channel(base):
     """The model for a channel."""
 
-    __tablename__ = 'channel'
+    __tablename__ = "channel"
 
     id = Column(String, primary_key=True)
     name = Column(String)

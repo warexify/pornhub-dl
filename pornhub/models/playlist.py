@@ -11,7 +11,7 @@ from pornhub.db import base
 class Playlist(base):
     """The model for a playlist."""
 
-    __tablename__ = 'playlist'
+    __tablename__ = "playlist"
 
     id = Column(String, primary_key=True)
     name = Column(String)

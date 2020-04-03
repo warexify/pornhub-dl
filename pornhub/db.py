@@ -7,7 +7,7 @@ from sqlalchemy_utils.functions import database_exists, create_database
 
 from pornhub.config import config
 
-engine = create_engine(config['sql_uri'])
+engine = create_engine(config["sql_uri"])
 base = declarative_base(bind=engine)
 
 
