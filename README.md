@@ -33,11 +33,11 @@ There is a help for all commands, but here are some examples anyway:
 
 ## How does it work?
 
-All videos are downloaded into respective folder with the name of the respective user.
-Pornhub-dl uses youtube-dl as a download backend, but implements own functionality, such as custom user meta-data extraction, user/channel following, as well as video list extraction and retry logic for rate limiting.
+All videos are downloaded into a folder with the name of the respective user.
+Pornhub-dl uses youtube-dl as a download backend, but implements own functionality, such as custom user meta-data extraction, user/channel/playlist following, as well as video list extraction and retry logic for rate limiting.
 
-Pornhub-dl crawls all video urls of all followed users/channels and remembers the ids of downloaded videos.
-If you update your database, all new videos will be downloaded, while old ones are simply skipped without invoking youtube-dl.
+Pornhub-dl crawls all video urls of all followed entities and remembers the ids of downloaded videos.
+If you update your database, new videos will be downloaded, while old ones are simply skipped without invoking youtube-dl.
 
 ## Configuration
 When starting the downloader for the first time, a configuration file is created at `~/.config/pornhub_dl.toml`
