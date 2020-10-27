@@ -94,9 +94,9 @@ def get_playlist_video_viewkeys(playlist):
 
     keys = []
     for video in videos.find_all("li"):
-        # Only get entries with _vkey attribute
+        # Only get entries with data-video-vkey attribute
         # There exist some elements, which have programmatic purpose
-        if video.has_attr("_vkey"):
-            keys.append(video["_vkey"])
+        if video.has_attr("data-video-vkey"):
+            keys.append(video["data-video-vkey"])
 
     return keys
