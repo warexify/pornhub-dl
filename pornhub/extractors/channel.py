@@ -135,8 +135,8 @@ def get_channel_viewkeys(channel):
             sys.exit(1)
 
         for video in videos.find_all("li"):
-            if video.has_attr("_vkey"):
-                keys.append(video["_vkey"])
+            if video.has_attr("data-video-vkey"):
+                keys.append(video["data-video-vkey"])
 
         current_page += 1
         next_url = url + f"?page={current_page}"

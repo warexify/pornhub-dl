@@ -178,8 +178,8 @@ def get_user_video_viewkeys(user):
             return []
 
         for video in videos.find_all("li"):
-            if video.has_attr("_vkey"):
-                keys.append(video["_vkey"])
+            if video.has_attr("data-video-vkey"):
+                keys.append(video["data-video-vkey"])
 
         current_page += 1
         next_url = url + f"?page={current_page}"
@@ -260,8 +260,8 @@ def get_video_upload_viewkeys(user, public=False):
             return []
 
         for video in videos.find_all("li"):
-            if video.has_attr("_vkey"):
-                keys.append(video["_vkey"])
+            if video.has_attr("data-video-vkey"):
+                keys.append(video["data-video-vkey"])
 
         current_page += 1
         next_url = url + f"?page={current_page}"
