@@ -5,7 +5,7 @@ Download all videos of your favorite pornhub models, playlists and channels and 
 ## Setup
 
 1. You will need `poetry` for dependency management and venv creation: `poetry install`
-1. Run the program once with `poetry run python ./main.py`. This will create the configuration file `~/.config/pornhub_dl.toml`.
+1. Run the program once with `poetry run python ./pornhub-dl`. This will create the configuration file `~/.config/pornhub_dl.toml`.
 1. The default config will try to create a new postgres database `pornhub` when running the program for the first time after the config has been created.
 If you want to change the database url, you need to adjust the sqluri in the configuration file.
 Pornhub-dl might work with other database engines (_mysql_, _sqlite_), but this hasn't been tested.
