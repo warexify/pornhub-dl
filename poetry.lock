@@ -1,6 +1,6 @@
 [[package]]
 name = "alembic"
-version = "1.5.4"
+version = "1.5.7"
 description = "A database migration tool for SQLAlchemy."
 category = "main"
 optional = false
@@ -205,7 +205,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "youtube-dl"
-version = "2021.2.10"
+version = "2021.3.3"
 description = "YouTube video downloader"
 category = "main"
 optional = false
@@ -218,7 +218,8 @@ content-hash = "eb2f4fa2a0caca665291ff3047635491891f06acf78491c32f9b9573e9fb15f3
 
 [metadata.files]
 alembic = [
-    {file = "alembic-1.5.4.tar.gz", hash = "sha256:e871118b6174681f7e9a9ea67cfcae954c6d18e05b49c6b17f662d2530c76bf5"},
+    {file = "alembic-1.5.7-py2.py3-none-any.whl", hash = "sha256:f33d561f3ce2ca390f1c87ff3849cd7d97bb93bae9c91357727263498e10028f"},
+    {file = "alembic-1.5.7.tar.gz", hash = "sha256:66bbb0e7d6277b007dfe7e27237093c79b76cf4f94e6fbd0f7af6f9409546fe6"},
 ]
 beautifulsoup4 = [
     {file = "beautifulsoup4-4.9.3-py2-none-any.whl", hash = "sha256:4c98143716ef1cb40bf7f39a8e3eec8f8b009509e74904ba3a7b315431577e35"},
@@ -406,6 +407,6 @@ urllib3 = [
     {file = "urllib3-1.26.3.tar.gz", hash = "sha256:de3eedaad74a2683334e282005cd8d7f22f4d55fa690a2a1020a416cb0a47e73"},
 ]
 youtube-dl = [
-    {file = "youtube_dl-2021.2.10-py2.py3-none-any.whl", hash = "sha256:e7d48cd42f3081e1e0064e69f31f2856508ef31c0fc80eeebd8e70c6a031a24d"},
-    {file = "youtube_dl-2021.2.10.tar.gz", hash = "sha256:b390cddbd4d605bd887d0d4063988cef0fa13f916d2e1e3564badbb22504d754"},
+    {file = "youtube_dl-2021.3.3-py2.py3-none-any.whl", hash = "sha256:28663ce51bb35d0a0fa764aed3492b38c570da0a5a62fef3c28f4431522a6d4a"},
+    {file = "youtube_dl-2021.3.3.tar.gz", hash = "sha256:02432aa2dd0e859e64d74fca2ad624abf3bead3dba811d594100e1cb7897dce7"},
 ]

@@ -1,19 +1,24 @@
 """Playlist extracting logic."""
 import re
 import os
+import sys
 import time
 import requests
 from bs4 import BeautifulSoup
 
-from pornhub.models import Clip
+from pornhub.models import Playlist, Clip
 from pornhub.logging import logger
-from pornhub.helper import get_clip_path, link_duplicate
+from pornhub.helper import get_clip_path, link_duplicate, check_logged_out
 from pornhub.download import get_soup, download_video
 
 
 def download_playlist_videos(session, playlist):
     """Download all videos of a playlist."""
-    viewkeys = get_playlist_video_viewkeys(playlist)
+    viewkeys = set(get_playlist_video_viewkeys(playlist))
+
+    if len(viewkeys) == 0:
+        logger.error(f"Found 0 videos in playlist {Playlist.id}. Aborting")
+        sys.exit(1)
 
     full_success = True
 
@@ -50,7 +55,7 @@ def download_playlist_videos(session, playlist):
 
 def get_playlist_video_url(playlist_id):
     """Compile the user videos url."""
-    is_premium = os.path.exists("http_cookie_file")
+    is_premium = os.path.exists("premium")
     if is_premium:
         return f"https://www.pornhubpremium.com/playlist/{playlist_id}"
 
@@ -71,15 +76,13 @@ def get_playlist_info(playlist_id):
         check_logged_out(soup)
         sys.exit(1)
 
-    link = header.find_all("a")[0]
+    title = header.find("span", {"id": "watchPlaylist"})
+    name = title.text.strip()
 
-    name = link.text.strip()
     name = name.replace(" ", "_")
     name = re.sub(r"[\W]+", "_", name)
 
-    return {
-        "name": name,
-    }
+    return {"name": name}
 
 
 def get_playlist_video_viewkeys(playlist):

@@ -5,7 +5,7 @@ from pornhub.logging import logger
 
 def get_clip_path(folder, title, extension):
     """Get a path for a clip by folder and title."""
-    return f"~/pornhub/{folder}/{title}.{extension}"
+    return f"/data/Media/Porn/{folder}/{title}.{extension}"
 
 
 def link_duplicate(clip, new_path):

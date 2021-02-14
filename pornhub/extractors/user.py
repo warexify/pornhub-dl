@@ -88,7 +88,7 @@ def get_user_info(key):
 def get_user_type_and_url(key):
     """Detect the user type and the respective url for this user."""
     possible_urls = {}
-    for user_type in [User.PORNSTAR, User.MODEL, User.USER]:
+    for user_type in [User.MODEL, User.USER, User.PORNSTAR]:
         possible_urls[user_type] = get_user_video_url(user_type, key)
 
     for user_type, url in possible_urls.items():
@@ -126,7 +126,7 @@ def get_user_name_from_soup(soup, website_type):
 
 def get_user_video_url(user_type, key):
     """Compile the user videos url."""
-    is_premium = os.path.exists("http_cookie_file")
+    is_premium = os.path.exists("premium")
     if is_premium:
         return f"https://www.pornhubpremium.com/{user_type}/{key}"
 
@@ -135,9 +135,9 @@ def get_user_video_url(user_type, key):
 
 def get_user_video_viewkeys(user):
     """Scrape viewkeys from the user's user/videos route."""
-    is_premium = os.path.exists("http_cookie_file")
+    is_premium = os.path.exists("premium")
     if is_premium:
-        url = f"https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos"
+        url = f"https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/premium"
     else:
         url = f"https://www.pornhub.com/{user.user_type}/{user.key}/videos"
 
@@ -196,17 +196,17 @@ def get_user_video_viewkeys(user):
 
 def get_video_upload_viewkeys(user, public=False):
     """Scrape viewkeys from the user's user/videos/upload route."""
-    is_premium = os.path.exists("http_cookie_file")
+    is_premium = os.path.exists("premium")
     if is_premium:
         url = (
-            f"https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/upload"
+            f"https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/premium"
         )
     else:
         url = f"https://www.pornhub.com/{user.user_type}/{user.key}/videos/upload"
 
     if public:
         if is_premium:
-            url = f"https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/public"
+            url = f"https://www.pornhubpremium.com/{user.user_type}/{user.key}/videos/upload"
         else:
             url = f"https://www.pornhub.com/{user.user_type}/{user.key}/videos/public"
 

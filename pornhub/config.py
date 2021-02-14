@@ -6,7 +6,7 @@ import logging
 
 default_config = {
     "sql_uri": "postgres://localhost/pornhub",
-    "location": os.path.expanduser("~/pornhub"),
+    "location": os.path.expanduser("/data/Media/Porn"),
 }
 
 config_path = os.path.expanduser("~/.config/pornhub_dl.toml")

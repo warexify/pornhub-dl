@@ -17,7 +17,7 @@ def download_channel_videos(session, channel):
     viewkeys = set(get_channel_viewkeys(channel))
 
     if len(viewkeys) == 0:
-        logger.error(f"Found 0 videos for user {user.key}. Aborting")
+        logger.error(f"Found 0 videos for channel {channel.id}. Aborting")
         sys.exit(1)
 
     full_success = True
@@ -55,7 +55,7 @@ def download_channel_videos(session, channel):
 
 def get_channel_video_url(channel_id):
     """Compile the channel videos url."""
-    is_premium = os.path.exists("http_cookie_file")
+    is_premium = os.path.exists("premium")
     if is_premium:
         return f"https://www.pornhubpremium.com/channels/{channel_id}"
 
@@ -89,7 +89,7 @@ def get_channel_info(channel_id):
 
 def get_channel_viewkeys(channel):
     """Scrape all public viewkeys of the channel's videos."""
-    is_premium = os.path.exists("http_cookie_file")
+    is_premium = os.path.exists("premium")
     if is_premium:
         url = f"https://www.pornhubpremium.com/channels/{channel.id}/videos"
     else:
